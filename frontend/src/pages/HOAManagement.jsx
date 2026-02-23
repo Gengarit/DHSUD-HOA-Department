@@ -29,8 +29,9 @@ function HOAManagement() {
       hoa.cert_of_inc_no?.toLowerCase().includes(search.toLowerCase());
     
     if (filter === 'All') return matches;
-    if (filter === 'Active') return matches && !hoa.is_sanctioned;
-    if (filter === 'Sanctioned') return matches && hoa.is_sanctioned;
+    if (filter === 'In Good Standing') return matches && hoa.status_findings === 'In Good Standing';
+    if (filter === 'Under Review') return matches && hoa.status_findings === 'Under Review';
+    if (filter === 'Sanctioned') return matches && hoa.status_findings === 'Sanctioned';
     return matches;
   });
 
@@ -62,14 +63,14 @@ function HOAManagement() {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-          {['All', 'Active', 'Under Review', 'Suspended', 'Pending'].map(status => (
+          {['All', 'In Good Standing', 'Under Review', 'Sanctioned'].map(status => (
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                 filter === status
-                  ? 'bg-[#6366F1] text-white'
-                  : 'bg-[#3A4A62] text-[#9CA3AF] hover:text-white'
+                  ? 'bg-[#6366F1] text-white shadow-lg'
+                  : 'bg-[#1A1F2B] text-[#9CA3AF] hover:bg-[#3A4A62] hover:text-white border border-[#3A4A62]'
               }`}
             >
               {status}
@@ -111,12 +112,12 @@ function HOAManagement() {
                 <td className="px-6 py-3">{new Date(hoa.issuance_date).toLocaleDateString()}</td>
                 <td className="px-6 py-3">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      hoa.is_sanctioned
-                        ? 'bg-red-900/30 text-red-400'
+                    className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                      hoa.status_findings === 'Sanctioned'
+                        ? 'bg-red-900/40 text-red-400 border border-red-800/50'
                         : hoa.status_findings === 'Under Review'
-                        ? 'bg-yellow-900/30 text-yellow-400'
-                        : 'bg-green-900/30 text-green-400'
+                        ? 'bg-yellow-900/40 text-yellow-400 border border-yellow-800/50'
+                        : 'bg-green-900/40 text-green-400 border border-green-800/50'
                     }`}
                   >
                     {hoa.status_findings || 'Unknown'}
