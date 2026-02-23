@@ -1,0 +1,1001 @@
+Control Number,First Name,Last Name,City,Blacklisted
+NIR-2026-00001,Clara,Alvarez,Isabela,0
+NIR-2026-00002,Jose,Ruiz,Escalante City,0
+NIR-2026-00003,Antonio,Rivera,Valladolid,0
+NIR-2026-00004,Roberto,Vega,Murcia,0
+NIR-2026-00005,Beatriz,Herrera,Dumaguete City,0
+NIR-2026-00006,Roberto,Reyes,Silay City,0
+NIR-2026-00007,Carlos,Mendoza,Ilog,0
+NIR-2026-00008,Francisco,Reyes,San Carlos City,0
+NIR-2026-00009,Pedro,Torres,Bindoy,0
+NIR-2026-00010,Isabel,Sanchez,Zamboanguita,0
+NIR-2026-00011,Elena,Diaz,Tanjay City,1
+NIR-2026-00012,Beatriz,Salazar,Bacolod City,0
+NIR-2026-00013,Miguel,Salazar,Canlaon City,0
+NIR-2026-00014,Josefa,Chavez,Dumaguete City,0
+NIR-2026-00015,Dolores,Delgado,Amlan,0
+NIR-2026-00016,Roberto,Santos,Sipalay City,0
+NIR-2026-00017,Dolores,Marquez,Tanjay City,0
+NIR-2026-00018,Esperanza,Rivera,Bago City,0
+NIR-2026-00019,Isabel,Moreno,Pamplona,0
+NIR-2026-00020,Carlos,Rivera,Bacong,0
+NIR-2026-00021,Manuel,Silva,Canlaon City,0
+NIR-2026-00022,Clara,Castillo,Himamaylan City,0
+NIR-2026-00023,Juan,Perez,Silay City,0
+NIR-2026-00024,Pilar,Salazar,Vallehermoso,0
+NIR-2026-00025,Maria,Morales,Bayawan,0
+NIR-2026-00026,Margarita,Vega,Cadiz City,0
+NIR-2026-00027,Isabel,Ruiz,Zamboanguita,0
+NIR-2026-00028,Isabel,Sanchez,Bacong,0
+NIR-2026-00029,Francisco,Morales,Bindoy,0
+NIR-2026-00030,Sergio,Cordero,Pulupandan,0
+NIR-2026-00031,Pedro,Navarro,Candoni,0
+NIR-2026-00032,Angela,Navarro,Manjuyod,0
+NIR-2026-00033,Maria,Romero,Isabela,0
+NIR-2026-00034,Maria,Torres,Salvador Benedicto,0
+NIR-2026-00035,Roberto,Bautista,Manjuyod,1
+NIR-2026-00036,Cecilia,Romero,Calatrava,0
+NIR-2026-00037,Luz,Marquez,Escalante City,0
+NIR-2026-00038,Pablo,Mendoza,Tayasan,0
+NIR-2026-00039,Juan,Romero,Murcia,0
+NIR-2026-00040,Ricardo,Ramirez,Zamboanguita,0
+NIR-2026-00041,Eduardo,Reyes,Tanjay City,0
+NIR-2026-00042,Pilar,Castro,La Castellana,0
+NIR-2026-00043,Carmen,Diaz,Jimalalud,0
+NIR-2026-00044,Antonio,Bautista,Bayawan,0
+NIR-2026-00045,Pedro,Morales,Bacong,0
+NIR-2026-00046,Rosa,Ramirez,Escalante City,0
+NIR-2026-00047,Pilar,Luna,Manjuyod,0
+NIR-2026-00048,Gabriel,Hernandez,Amlan,0
+NIR-2026-00049,Ricardo,Rivera,Enrique B. Magalona,0
+NIR-2026-00050,Elena,Espinosa,Dauin,0
+NIR-2026-00051,Ramon,Silva,Basay,0
+NIR-2026-00052,Pablo,Delgado,Himamaylan City,0
+NIR-2026-00053,Josefa,Espinosa,Amlan,0
+NIR-2026-00054,Eduardo,Ortiz,Cadiz City,0
+NIR-2026-00055,Miguel,Ramos,Toboso,0
+NIR-2026-00056,Ana,Ortiz,Moises Padilla,0
+NIR-2026-00057,Rosa,Guerrero,Dauin,0
+NIR-2026-00058,Eduardo,Diaz,Basay,0
+NIR-2026-00059,Fernando,Mendoza,Pamplona,0
+NIR-2026-00060,Carlos,Cuevas,Zamboanguita,0
+NIR-2026-00061,Ana,Cruz,Isabela,0
+NIR-2026-00062,Ricardo,Navarro,Hinigaran,0
+NIR-2026-00063,Fernando,Ramirez,Basay,0
+NIR-2026-00064,Pablo,Cordero,Binalbagan,0
+NIR-2026-00065,Mercedes,Jimenez,Kabankalan City,0
+NIR-2026-00066,Javier,Ramirez,Ilog,0
+NIR-2026-00067,Ramon,Cordero,Dumaguete City,0
+NIR-2026-00068,Clara,Aguilar,Dauin,0
+NIR-2026-00069,Beatriz,Ramos,Bindoy,1
+NIR-2026-00070,Angela,Reyes,Hinoba-an,0
+NIR-2026-00071,Maria,Medina,Tanjay City,0
+NIR-2026-00072,Cecilia,Diaz,Pamplona,0
+NIR-2026-00073,Manuel,Perez,Bacong,0
+NIR-2026-00074,Cristina,Gomez,Vallehermoso,0
+NIR-2026-00075,Consuelo,Mendoza,Himamaylan City,0
+NIR-2026-00076,Ramon,Alvarez,Guihulngan City,0
+NIR-2026-00077,Ramon,Hernandez,Tayasan,0
+NIR-2026-00078,Maria,Ramos,Calatrava,0
+NIR-2026-00079,Enrique,Chavez,Sibulan,0
+NIR-2026-00080,Jorge,Ocampo,Mabinay,1
+NIR-2026-00081,Pilar,Castillo,Hinigaran,1
+NIR-2026-00082,Victoria,Romero,Sagay City,0
+NIR-2026-00083,Isabel,Delgado,La Libertad,0
+NIR-2026-00084,Victoria,Ramirez,Kabankalan City,0
+NIR-2026-00085,Alfonso,Ramirez,Silay City,0
+NIR-2026-00086,Pedro,Navarro,Calatrava,0
+NIR-2026-00087,Patricia,Bautista,Mabinay,0
+NIR-2026-00088,Esperanza,Alvarez,Kabankalan City,0
+NIR-2026-00089,Carmen,Vargas,Pontevedra,0
+NIR-2026-00090,Diego,Mendoza,Zamboanguita,0
+NIR-2026-00091,Josefa,Mejia,Silay City,0
+NIR-2026-00092,Juan,Chavez,Sipalay City,0
+NIR-2026-00093,Gabriel,Cuevas,Pamplona,0
+NIR-2026-00094,Elena,Medina,Dumaguete City,0
+NIR-2026-00095,Patricia,Ayala,Murcia,0
+NIR-2026-00096,Clara,Herrera,Amlan,0
+NIR-2026-00097,Angela,Torres,Enrique B. Magalona,0
+NIR-2026-00098,Victoria,Ramirez,Bindoy,0
+NIR-2026-00099,Raul,Ocampo,San Enrique,0
+NIR-2026-00100,Rosario,Vargas,Bacong,0
+NIR-2026-00101,Jose,Fernandez,Candoni,0
+NIR-2026-00102,Carmen,Cordero,Hinoba-an,0
+NIR-2026-00103,Diego,Vega,Canlaon City,0
+NIR-2026-00104,Isabel,Santos,Bais City,0
+NIR-2026-00105,Victoria,Cordero,La Libertad,0
+NIR-2026-00106,Carmen,Cordero,San Carlos City,0
+NIR-2026-00107,Sofia,Vargas,Dauin,1
+NIR-2026-00108,Ricardo,Sanchez,Salvador Benedicto,0
+NIR-2026-00109,Esperanza,Marquez,Escalante City,0
+NIR-2026-00110,Alberto,Santos,Salvador Benedicto,0
+NIR-2026-00111,Ana,Luna,Escalante City,1
+NIR-2026-00112,Patricia,Aguilar,Mabinay,0
+NIR-2026-00113,Pablo,Ocampo,Vallehermoso,0
+NIR-2026-00114,Luis,Campos,Bacong,0
+NIR-2026-00115,Francisco,Alvarez,Bacolod City,0
+NIR-2026-00116,Ramon,Morales,Salvador Benedicto,0
+NIR-2026-00117,Luis,Gonzales,Amlan,0
+NIR-2026-00118,Alberto,Ramos,La Castellana,0
+NIR-2026-00119,Antonio,Silva,Moises Padilla,0
+NIR-2026-00120,Elena,Castro,Amlan,1
+NIR-2026-00121,Esperanza,Gonzales,Basay,0
+NIR-2026-00122,Clara,Lopez,Bayawan,0
+NIR-2026-00123,Cecilia,Ramos,Tanjay City,0
+NIR-2026-00124,Clara,Mendoza,Victorias City,0
+NIR-2026-00125,Elena,Gutierrez,Vallehermoso,0
+NIR-2026-00126,Clara,Alvarez,Calatrava,0
+NIR-2026-00127,Roberto,Rivera,Bayawan,0
+NIR-2026-00128,Francisco,Bautista,La Libertad,1
+NIR-2026-00129,Enrique,Herrera,Valladolid,0
+NIR-2026-00130,Alfonso,Reyes,Zamboanguita,0
+NIR-2026-00131,Enrique,Lopez,Salvador Benedicto,1
+NIR-2026-00132,Angela,Silva,Dauin,0
+NIR-2026-00133,Gloria,Diaz,Cadiz City,0
+NIR-2026-00134,Raul,Perez,Dauin,0
+NIR-2026-00135,Roberto,Cuevas,Hinigaran,0
+NIR-2026-00136,Rosario,Aguilar,Cauayan,0
+NIR-2026-00137,Clara,Medina,Calatrava,0
+NIR-2026-00138,Pedro,Silva,Enrique B. Magalona,0
+NIR-2026-00139,Patricia,Medina,Canlaon City,0
+NIR-2026-00140,Eduardo,Flores,Pontevedra,0
+NIR-2026-00141,Roberto,Ruiz,Escalante City,0
+NIR-2026-00142,Teresa,Vega,Bais City,1
+NIR-2026-00143,Rosa,Mejia,Moises Padilla,0
+NIR-2026-00144,Consuelo,Flores,Vallehermoso,1
+NIR-2026-00145,Cecilia,Castillo,Bindoy,0
+NIR-2026-00146,Diego,Cordero,Binalbagan,0
+NIR-2026-00147,Gloria,Guerrero,Silay City,0
+NIR-2026-00148,Isabel,Ramirez,Bais City,0
+NIR-2026-00149,Josefa,Castro,Basay,0
+NIR-2026-00150,Francisco,Mejia,Bayawan,0
+NIR-2026-00151,Raul,Mendoza,Canlaon City,0
+NIR-2026-00152,Enrique,Marquez,Salvador Benedicto,0
+NIR-2026-00153,Cecilia,Ruiz,Sagay City,0
+NIR-2026-00154,Pilar,Salazar,La Castellana,0
+NIR-2026-00155,Roberto,Vega,La Castellana,0
+NIR-2026-00156,Maria,Castillo,Calatrava,0
+NIR-2026-00157,Gabriel,Medina,Guihulngan City,0
+NIR-2026-00158,Cecilia,Silva,Bindoy,0
+NIR-2026-00159,Francisco,Marquez,Santa Catalina,0
+NIR-2026-00160,Antonio,Cuevas,Calatrava,0
+NIR-2026-00161,Cecilia,Alvarez,Bacong,0
+NIR-2026-00162,Pedro,Mendoza,Basay,0
+NIR-2026-00163,Roberto,Delgado,Vallehermoso,0
+NIR-2026-00164,Ricardo,Mendoza,Sibulan,0
+NIR-2026-00165,Mercedes,Medina,Jimalalud,0
+NIR-2026-00166,Jorge,Cuevas,San Carlos City,0
+NIR-2026-00167,Gloria,Guerrero,Murcia,0
+NIR-2026-00168,Mercedes,Ramirez,Manapla,0
+NIR-2026-00169,Patricia,Alvarez,Enrique B. Magalona,0
+NIR-2026-00170,Josefa,Mendoza,Pulupandan,0
+NIR-2026-00171,Dolores,Santos,Ilog,0
+NIR-2026-00172,Cecilia,Espinosa,Mabinay,0
+NIR-2026-00173,Alberto,Bautista,Jimalalud,0
+NIR-2026-00174,Consuelo,Vega,Pamplona,0
+NIR-2026-00175,Maria,Fernandez,Valladolid,0
+NIR-2026-00176,Teresa,Garcia,Siaton,1
+NIR-2026-00177,Victoria,Morales,Hinigaran,0
+NIR-2026-00178,Juan,Ramos,Cadiz City,1
+NIR-2026-00179,Eduardo,Jimenez,Dumaguete City,0
+NIR-2026-00180,Carmen,Garcia,Manapla,1
+NIR-2026-00181,Roberto,Silva,Zamboanguita,0
+NIR-2026-00182,Javier,Santos,Mabinay,0
+NIR-2026-00183,Ramon,Guerrero,Ayungon,0
+NIR-2026-00184,Teresa,Torres,Manapla,0
+NIR-2026-00185,Isabel,Ocampo,Tayasan,0
+NIR-2026-00186,Juan,Aguilar,Tayasan,0
+NIR-2026-00187,Carlos,Castillo,Sipalay City,0
+NIR-2026-00188,Carlos,Ruiz,Bais City,0
+NIR-2026-00189,Jorge,Luna,Binalbagan,0
+NIR-2026-00190,Angela,Ramirez,La Castellana,0
+NIR-2026-00191,Gloria,Luna,La Carlota City,0
+NIR-2026-00192,Juan,Moreno,Zamboanguita,0
+NIR-2026-00193,Carlos,Luna,Murcia,0
+NIR-2026-00194,Eduardo,Silva,Canlaon City,0
+NIR-2026-00195,Juan,Aguilar,Valencia,1
+NIR-2026-00196,Carlos,Fernandez,Dauin,0
+NIR-2026-00197,Angela,Ruiz,Bindoy,0
+NIR-2026-00198,Patricia,Campos,Murcia,0
+NIR-2026-00199,Margarita,Vargas,Talisay City,0
+NIR-2026-00200,Ana,Silva,Victorias City,0
+NIR-2026-00201,Elena,Salazar,Salvador Benedicto,0
+NIR-2026-00202,Juan,Ramirez,Guihulngan City,0
+NIR-2026-00203,Pablo,Cruz,Murcia,0
+NIR-2026-00204,Pablo,Delgado,Toboso,0
+NIR-2026-00205,Alejandro,Ocampo,Basay,0
+NIR-2026-00206,Miguel,Garcia,Kabankalan City,0
+NIR-2026-00207,Carmen,Gonzales,Mabinay,0
+NIR-2026-00208,Sergio,Vargas,San Carlos City,0
+NIR-2026-00209,Gloria,Garcia,San Jose,0
+NIR-2026-00210,Ramon,Espinosa,Santa Catalina,0
+NIR-2026-00211,Jose,Cuevas,La Castellana,0
+NIR-2026-00212,Luz,Vargas,Sibulan,0
+NIR-2026-00213,Luis,Bautista,Bacolod City,0
+NIR-2026-00214,Gloria,Luna,San Enrique,0
+NIR-2026-00215,Esperanza,Vega,Amlan,0
+NIR-2026-00216,Alfonso,Garcia,Pamplona,0
+NIR-2026-00217,Luz,Moreno,San Enrique,0
+NIR-2026-00218,Antonio,Flores,Hinigaran,0
+NIR-2026-00219,Margarita,Romero,Victorias City,0
+NIR-2026-00220,Maria,Ruiz,Guihulngan City,0
+NIR-2026-00221,Javier,Vargas,La Libertad,0
+NIR-2026-00222,Miguel,Mejia,Candoni,0
+NIR-2026-00223,Angela,Delgado,San Jose,1
+NIR-2026-00224,Beatriz,Rivera,San Jose,0
+NIR-2026-00225,Raul,Gonzales,Dumaguete City,1
+NIR-2026-00226,Cecilia,Fernandez,Pontevedra,1
+NIR-2026-00227,Sergio,Silva,Mabinay,0
+NIR-2026-00228,Patricia,Ayala,Himamaylan City,0
+NIR-2026-00229,Fernando,Castillo,Calatrava,0
+NIR-2026-00230,Enrique,Mendoza,Pamplona,0
+NIR-2026-00231,Jorge,Sanchez,Guihulngan City,0
+NIR-2026-00232,Diego,Rivera,Tayasan,0
+NIR-2026-00233,Antonio,Chavez,Hinigaran,0
+NIR-2026-00234,Patricia,Gutierrez,Pamplona,0
+NIR-2026-00235,Raul,Espinosa,Mabinay,0
+NIR-2026-00236,Miguel,Castro,San Jose,0
+NIR-2026-00237,Sergio,Gutierrez,Kabankalan City,0
+NIR-2026-00238,Josefa,Castro,Tanjay City,0
+NIR-2026-00239,Angela,Marquez,Dumaguete City,1
+NIR-2026-00240,Ana,Perez,Zamboanguita,0
+NIR-2026-00241,Ricardo,Navarro,Moises Padilla,0
+NIR-2026-00242,Alejandro,Garcia,Canlaon City,0
+NIR-2026-00243,Miguel,Ortiz,Bais City,0
+NIR-2026-00244,Isabel,Jimenez,Talisay City,0
+NIR-2026-00245,Pablo,Sanchez,Canlaon City,0
+NIR-2026-00246,Sofia,Alvarez,Bacolod City,0
+NIR-2026-00247,Patricia,Chavez,Candoni,0
+NIR-2026-00248,Sofia,Ocampo,San Jose,0
+NIR-2026-00249,Sergio,Campos,Bago City,0
+NIR-2026-00250,Javier,Rivera,Bayawan,0
+NIR-2026-00251,Raul,Garcia,Victorias City,0
+NIR-2026-00252,Rosa,Mendoza,San Jose,0
+NIR-2026-00253,Patricia,Aguilar,Victorias City,0
+NIR-2026-00254,Francisco,Gonzales,Vallehermoso,0
+NIR-2026-00255,Alfonso,Bautista,San Enrique,1
+NIR-2026-00256,Patricia,Castro,Enrique B. Magalona,0
+NIR-2026-00257,Luis,Medina,Hinoba-an,0
+NIR-2026-00258,Rosa,Torres,Hinigaran,0
+NIR-2026-00259,Miguel,Ramirez,Enrique B. Magalona,0
+NIR-2026-00260,Juan,Guerrero,Escalante City,0
+NIR-2026-00261,Maria,Lopez,La Carlota City,0
+NIR-2026-00262,Juan,Cuevas,Hinigaran,0
+NIR-2026-00263,Isabel,Ramirez,Hinoba-an,0
+NIR-2026-00264,Eduardo,Ruiz,Amlan,0
+NIR-2026-00265,Beatriz,Bautista,Pontevedra,0
+NIR-2026-00266,Esperanza,Gomez,La Libertad,0
+NIR-2026-00267,Angela,Chavez,Bayawan,0
+NIR-2026-00268,Alberto,Aguilar,Hinigaran,0
+NIR-2026-00269,Margarita,Fernandez,Candoni,0
+NIR-2026-00270,Carmen,Cordero,Pamplona,0
+NIR-2026-00271,Pablo,Flores,Siaton,0
+NIR-2026-00272,Margarita,Santos,Cadiz City,0
+NIR-2026-00273,Alfonso,Medina,Bago City,0
+NIR-2026-00274,Elena,Garcia,Sagay City,0
+NIR-2026-00275,Clara,Cuevas,Bayawan,0
+NIR-2026-00276,Cristina,Vega,Guihulngan City,0
+NIR-2026-00277,Alejandro,Cordero,Victorias City,0
+NIR-2026-00278,Angela,Luna,Silay City,0
+NIR-2026-00279,Elena,Perez,La Castellana,1
+NIR-2026-00280,Diego,Ramos,Sagay City,0
+NIR-2026-00281,Raul,Santos,La Carlota City,0
+NIR-2026-00282,Roberto,Castillo,Valladolid,0
+NIR-2026-00283,Javier,Flores,Dumaguete City,0
+NIR-2026-00284,Margarita,Salazar,Sibulan,0
+NIR-2026-00285,Pedro,Marquez,Sipalay City,0
+NIR-2026-00286,Teresa,Salazar,Bago City,0
+NIR-2026-00287,Gloria,Fernandez,Salvador Benedicto,0
+NIR-2026-00288,Miguel,Ramos,Himamaylan City,0
+NIR-2026-00289,Margarita,Sanchez,Pulupandan,0
+NIR-2026-00290,Isabel,Castro,Himamaylan City,0
+NIR-2026-00291,Ana,Vargas,Bago City,0
+NIR-2026-00292,Ana,Gonzales,Candoni,0
+NIR-2026-00293,Sergio,Perez,Hinoba-an,0
+NIR-2026-00294,Rosario,Gomez,Hinigaran,0
+NIR-2026-00295,Pablo,Fernandez,Basay,0
+NIR-2026-00296,Manuel,Hernandez,La Carlota City,0
+NIR-2026-00297,Roberto,Rivera,Bayawan,0
+NIR-2026-00298,Ramon,Fernandez,La Castellana,0
+NIR-2026-00299,Maria,Cruz,Sibulan,0
+NIR-2026-00300,Manuel,Chavez,Hinigaran,0
+NIR-2026-00301,Gabriel,Delgado,Toboso,0
+NIR-2026-00302,Alberto,Chavez,Dauin,0
+NIR-2026-00303,Francisco,Garcia,San Carlos City,0
+NIR-2026-00304,Pilar,Campos,Ayungon,0
+NIR-2026-00305,Fernando,Moreno,La Carlota City,0
+NIR-2026-00306,Rosa,Vega,Escalante City,0
+NIR-2026-00307,Dolores,Ramirez,La Carlota City,0
+NIR-2026-00308,Beatriz,Gonzales,Bayawan,0
+NIR-2026-00309,Ricardo,Cruz,Manjuyod,0
+NIR-2026-00310,Carlos,Delgado,Bacolod City,0
+NIR-2026-00311,Dolores,Torres,Pontevedra,0
+NIR-2026-00312,Miguel,Fernandez,Escalante City,0
+NIR-2026-00313,Antonio,Ortiz,Siaton,0
+NIR-2026-00314,Jorge,Ortiz,Enrique B. Magalona,0
+NIR-2026-00315,Alfonso,Hernandez,Hinoba-an,0
+NIR-2026-00316,Ramon,Torres,Manapla,0
+NIR-2026-00317,Sergio,Diaz,Candoni,0
+NIR-2026-00318,Miguel,Flores,Manjuyod,0
+NIR-2026-00319,Eduardo,Sanchez,Murcia,0
+NIR-2026-00320,Consuelo,Diaz,Silay City,0
+NIR-2026-00321,Javier,Sanchez,Canlaon City,0
+NIR-2026-00322,Pilar,Romero,Binalbagan,0
+NIR-2026-00323,Manuel,Ocampo,Bais City,0
+NIR-2026-00324,Raul,Jimenez,Bacolod City,0
+NIR-2026-00325,Francisco,Cruz,Candoni,0
+NIR-2026-00326,Mercedes,Vega,La Castellana,0
+NIR-2026-00327,Alfonso,Aguilar,Jimalalud,0
+NIR-2026-00328,Sofia,Silva,Ayungon,0
+NIR-2026-00329,Alfonso,Sanchez,Pontevedra,0
+NIR-2026-00330,Gabriel,Castro,Moises Padilla,0
+NIR-2026-00331,Francisco,Castro,Escalante City,1
+NIR-2026-00332,Mercedes,Aguilar,Toboso,0
+NIR-2026-00333,Ramon,Rivera,Dumaguete City,0
+NIR-2026-00334,Clara,Diaz,Bago City,0
+NIR-2026-00335,Esperanza,Castro,Cadiz City,0
+NIR-2026-00336,Ramon,Flores,Sagay City,0
+NIR-2026-00337,Diego,Delgado,Victorias City,0
+NIR-2026-00338,Victoria,Gomez,Pontevedra,0
+NIR-2026-00339,Maria,Ortiz,Sipalay City,0
+NIR-2026-00340,Elena,Vega,Murcia,0
+NIR-2026-00341,Carlos,Aguilar,Tayasan,0
+NIR-2026-00342,Dolores,Ocampo,Moises Padilla,0
+NIR-2026-00343,Rosario,Salazar,Bacong,0
+NIR-2026-00344,Antonio,Reyes,Escalante City,0
+NIR-2026-00345,Pablo,Gutierrez,Dauin,0
+NIR-2026-00346,Ricardo,Flores,Valencia,0
+NIR-2026-00347,Ricardo,Ruiz,La Carlota City,0
+NIR-2026-00348,Rosa,Gomez,Dauin,0
+NIR-2026-00349,Isabel,Cruz,Bayawan,0
+NIR-2026-00350,Luz,Mendoza,Canlaon City,0
+NIR-2026-00351,Miguel,Lopez,Sipalay City,0
+NIR-2026-00352,Josefa,Bautista,Ilog,0
+NIR-2026-00353,Jose,Salazar,La Castellana,0
+NIR-2026-00354,Roberto,Gomez,Vallehermoso,0
+NIR-2026-00355,Consuelo,Lopez,La Libertad,0
+NIR-2026-00356,Beatriz,Castro,Kabankalan City,0
+NIR-2026-00357,Rosa,Flores,La Carlota City,0
+NIR-2026-00358,Alejandro,Gutierrez,Basay,0
+NIR-2026-00359,Javier,Medina,Tanjay City,0
+NIR-2026-00360,Cecilia,Ramos,Victorias City,0
+NIR-2026-00361,Carlos,Ramos,Isabela,0
+NIR-2026-00362,Isabel,Vargas,San Carlos City,0
+NIR-2026-00363,Angela,Hernandez,Amlan,0
+NIR-2026-00364,Rosario,Ortiz,Ilog,0
+NIR-2026-00365,Diego,Espinosa,San Jose,0
+NIR-2026-00366,Isabel,Sanchez,San Enrique,0
+NIR-2026-00367,Roberto,Ramirez,Toboso,0
+NIR-2026-00368,Alejandro,Hernandez,Pulupandan,0
+NIR-2026-00369,Angela,Ramos,Pontevedra,0
+NIR-2026-00370,Carlos,Ocampo,Bacong,0
+NIR-2026-00371,Consuelo,Hernandez,Sagay City,0
+NIR-2026-00372,Jose,Ramirez,Valladolid,0
+NIR-2026-00373,Consuelo,Ramos,Toboso,0
+NIR-2026-00374,Victoria,Guerrero,Moises Padilla,0
+NIR-2026-00375,Raul,Ramos,Bacong,0
+NIR-2026-00376,Alberto,Salazar,Valladolid,0
+NIR-2026-00377,Fernando,Diaz,Moises Padilla,0
+NIR-2026-00378,Maria,Herrera,San Enrique,0
+NIR-2026-00379,Rosario,Cordero,Escalante City,0
+NIR-2026-00380,Carlos,Ramos,Binalbagan,0
+NIR-2026-00381,Patricia,Lopez,Manapla,0
+NIR-2026-00382,Ramon,Salazar,Himamaylan City,0
+NIR-2026-00383,Sofia,Gomez,Tanjay City,0
+NIR-2026-00384,Beatriz,Navarro,Dauin,0
+NIR-2026-00385,Pablo,Romero,Enrique B. Magalona,0
+NIR-2026-00386,Enrique,Gutierrez,Moises Padilla,0
+NIR-2026-00387,Miguel,Castro,Pulupandan,0
+NIR-2026-00388,Luz,Sanchez,Binalbagan,0
+NIR-2026-00389,Margarita,Vega,Toboso,0
+NIR-2026-00390,Pilar,Garcia,Pulupandan,0
+NIR-2026-00391,Ramon,Ruiz,Hinigaran,0
+NIR-2026-00392,Ramon,Vega,Vallehermoso,0
+NIR-2026-00393,Luz,Jimenez,Dumaguete City,0
+NIR-2026-00394,Esperanza,Marquez,Sipalay City,0
+NIR-2026-00395,Angela,Cruz,Bacolod City,0
+NIR-2026-00396,Roberto,Ayala,Cauayan,0
+NIR-2026-00397,Patricia,Sanchez,Himamaylan City,0
+NIR-2026-00398,Ana,Cuevas,Canlaon City,0
+NIR-2026-00399,Gabriel,Guerrero,Canlaon City,0
+NIR-2026-00400,Victoria,Mejia,Binalbagan,0
+NIR-2026-00401,Fernando,Salazar,Pontevedra,0
+NIR-2026-00402,Gloria,Herrera,Talisay City,0
+NIR-2026-00403,Roberto,Ocampo,Valencia,0
+NIR-2026-00404,Miguel,Ruiz,Cadiz City,0
+NIR-2026-00405,Elena,Medina,Pontevedra,0
+NIR-2026-00406,Gloria,Aguilar,Murcia,0
+NIR-2026-00407,Pilar,Rivera,Toboso,0
+NIR-2026-00408,Luis,Ruiz,Basay,0
+NIR-2026-00409,Angela,Lopez,Bacong,0
+NIR-2026-00410,Josefa,Luna,Mabinay,0
+NIR-2026-00411,Jose,Gutierrez,Dauin,0
+NIR-2026-00412,Francisco,Marquez,Hinoba-an,0
+NIR-2026-00413,Clara,Hernandez,San Jose,0
+NIR-2026-00414,Victoria,Alvarez,Moises Padilla,0
+NIR-2026-00415,Teresa,Ocampo,Cadiz City,0
+NIR-2026-00416,Patricia,Rivera,Victorias City,0
+NIR-2026-00417,Esperanza,Cuevas,Toboso,0
+NIR-2026-00418,Gloria,Guerrero,Pamplona,0
+NIR-2026-00419,Dolores,Cuevas,Toboso,0
+NIR-2026-00420,Cecilia,Gutierrez,Sagay City,0
+NIR-2026-00421,Alfonso,Aguilar,Pontevedra,1
+NIR-2026-00422,Elena,Perez,Enrique B. Magalona,0
+NIR-2026-00423,Gabriel,Fernandez,Calatrava,0
+NIR-2026-00424,Raul,Ortiz,Silay City,0
+NIR-2026-00425,Ana,Guerrero,Bacolod City,0
+NIR-2026-00426,Alberto,Mendoza,Bindoy,0
+NIR-2026-00427,Enrique,Garcia,Bago City,0
+NIR-2026-00428,Juan,Flores,La Libertad,0
+NIR-2026-00429,Javier,Reyes,Santa Catalina,0
+NIR-2026-00430,Raul,Luna,Candoni,0
+NIR-2026-00431,Cristina,Chavez,Bayawan,0
+NIR-2026-00432,Clara,Bautista,Enrique B. Magalona,0
+NIR-2026-00433,Rosario,Mendoza,Dauin,0
+NIR-2026-00434,Rosa,Reyes,Bacong,0
+NIR-2026-00435,Victoria,Vargas,San Jose,0
+NIR-2026-00436,Ana,Ayala,Kabankalan City,0
+NIR-2026-00437,Angela,Ocampo,Valladolid,0
+NIR-2026-00438,Teresa,Cruz,Toboso,0
+NIR-2026-00439,Javier,Chavez,Sipalay City,0
+NIR-2026-00440,Mercedes,Castillo,Enrique B. Magalona,0
+NIR-2026-00441,Diego,Torres,Tayasan,0
+NIR-2026-00442,Antonio,Ruiz,Enrique B. Magalona,0
+NIR-2026-00443,Beatriz,Luna,Sibulan,0
+NIR-2026-00444,Miguel,Ramirez,Bago City,0
+NIR-2026-00445,Juan,Castillo,La Libertad,0
+NIR-2026-00446,Margarita,Alvarez,La Castellana,0
+NIR-2026-00447,Cecilia,Reyes,Hinigaran,0
+NIR-2026-00448,Clara,Gonzales,Basay,0
+NIR-2026-00449,Miguel,Ocampo,Candoni,0
+NIR-2026-00450,Alberto,Ayala,Manjuyod,0
+NIR-2026-00451,Gabriel,Ramos,Toboso,0
+NIR-2026-00452,Miguel,Garcia,Ayungon,0
+NIR-2026-00453,Elena,Sanchez,Guihulngan City,0
+NIR-2026-00454,Pablo,Espinosa,Mabinay,0
+NIR-2026-00455,Francisco,Chavez,Isabela,0
+NIR-2026-00456,Patricia,Rivera,Tayasan,0
+NIR-2026-00457,Dolores,Lopez,Bayawan,0
+NIR-2026-00458,Josefa,Gomez,Cadiz City,0
+NIR-2026-00459,Raul,Rivera,Siaton,0
+NIR-2026-00460,Pablo,Luna,Bayawan,0
+NIR-2026-00461,Raul,Reyes,Guihulngan City,0
+NIR-2026-00462,Consuelo,Gonzales,Bindoy,0
+NIR-2026-00463,Alejandro,Cruz,Tayasan,0
+NIR-2026-00464,Pablo,Castillo,Bacong,0
+NIR-2026-00465,Eduardo,Aguilar,La Carlota City,0
+NIR-2026-00466,Jose,Alvarez,Vallehermoso,0
+NIR-2026-00467,Angela,Campos,San Enrique,0
+NIR-2026-00468,Ana,Moreno,Pontevedra,0
+NIR-2026-00469,Alberto,Navarro,Bindoy,0
+NIR-2026-00470,Roberto,Ruiz,Canlaon City,0
+NIR-2026-00471,Margarita,Bautista,Talisay City,0
+NIR-2026-00472,Pablo,Ocampo,Mabinay,0
+NIR-2026-00473,Carmen,Gutierrez,Pamplona,0
+NIR-2026-00474,Clara,Ruiz,Dumaguete City,0
+NIR-2026-00475,Victoria,Cordero,Basay,0
+NIR-2026-00476,Cristina,Garcia,Toboso,0
+NIR-2026-00477,Esperanza,Diaz,Dumaguete City,0
+NIR-2026-00478,Juan,Salazar,Bago City,0
+NIR-2026-00479,Cristina,Flores,Siaton,0
+NIR-2026-00480,Elena,Delgado,Valladolid,0
+NIR-2026-00481,Consuelo,Morales,Sipalay City,1
+NIR-2026-00482,Alberto,Perez,Salvador Benedicto,1
+NIR-2026-00483,Carmen,Cruz,Talisay City,0
+NIR-2026-00484,Pedro,Mejia,Santa Catalina,0
+NIR-2026-00485,Consuelo,Romero,La Libertad,0
+NIR-2026-00486,Cristina,Herrera,Bais City,0
+NIR-2026-00487,Enrique,Ortiz,Toboso,0
+NIR-2026-00488,Diego,Perez,Canlaon City,0
+NIR-2026-00489,Miguel,Torres,San Jose,0
+NIR-2026-00490,Mercedes,Mejia,Talisay City,0
+NIR-2026-00491,Raul,Ruiz,Sibulan,0
+NIR-2026-00492,Ramon,Medina,Bayawan,0
+NIR-2026-00493,Rosario,Fernandez,Bais City,0
+NIR-2026-00494,Alfonso,Perez,La Castellana,0
+NIR-2026-00495,Pedro,Perez,Pulupandan,0
+NIR-2026-00496,Carmen,Diaz,Vallehermoso,0
+NIR-2026-00497,Gabriel,Moreno,Candoni,0
+NIR-2026-00498,Luz,Lopez,Guihulngan City,0
+NIR-2026-00499,Pilar,Diaz,San Enrique,0
+NIR-2026-00500,Sergio,Gomez,Binalbagan,0
+NIR-2026-00501,Angela,Gomez,Binalbagan,0
+NIR-2026-00502,Alejandro,Ramirez,Amlan,0
+NIR-2026-00503,Maria,Espinosa,Bago City,0
+NIR-2026-00504,Jose,Hernandez,Pulupandan,1
+NIR-2026-00505,Carmen,Medina,Tanjay City,0
+NIR-2026-00506,Sofia,Gonzales,Manapla,0
+NIR-2026-00507,Margarita,Flores,Hinigaran,0
+NIR-2026-00508,Cristina,Diaz,Manapla,0
+NIR-2026-00509,Eduardo,Cordero,Talisay City,0
+NIR-2026-00510,Juan,Perez,Kabankalan City,0
+NIR-2026-00511,Victoria,Ramos,Dauin,0
+NIR-2026-00512,Luis,Vega,Salvador Benedicto,0
+NIR-2026-00513,Antonio,Cordero,Escalante City,0
+NIR-2026-00514,Diego,Gutierrez,Guihulngan City,0
+NIR-2026-00515,Teresa,Aguilar,Enrique B. Magalona,0
+NIR-2026-00516,Patricia,Ortiz,Mabinay,0
+NIR-2026-00517,Gabriel,Luna,Bindoy,0
+NIR-2026-00518,Manuel,Ayala,Pontevedra,0
+NIR-2026-00519,Gloria,Marquez,Dauin,0
+NIR-2026-00520,Teresa,Ruiz,Moises Padilla,0
+NIR-2026-00521,Teresa,Torres,Santa Catalina,0
+NIR-2026-00522,Maria,Jimenez,Escalante City,0
+NIR-2026-00523,Jose,Perez,Kabankalan City,0
+NIR-2026-00524,Patricia,Flores,San Jose,0
+NIR-2026-00525,Gabriel,Castillo,Amlan,0
+NIR-2026-00526,Patricia,Espinosa,Hinoba-an,1
+NIR-2026-00527,Pedro,Espinosa,Tanjay City,0
+NIR-2026-00528,Carlos,Guerrero,Mabinay,0
+NIR-2026-00529,Josefa,Cordero,Mabinay,1
+NIR-2026-00530,Rosa,Ocampo,Tanjay City,0
+NIR-2026-00531,Angela,Mejia,Victorias City,0
+NIR-2026-00532,Carlos,Mendoza,Ilog,0
+NIR-2026-00533,Patricia,Gonzales,Dumaguete City,0
+NIR-2026-00534,Isabel,Reyes,Isabela,0
+NIR-2026-00535,Gloria,Ramos,Vallehermoso,0
+NIR-2026-00536,Rosa,Moreno,Victorias City,0
+NIR-2026-00537,Angela,Garcia,Dumaguete City,0
+NIR-2026-00538,Josefa,Hernandez,Enrique B. Magalona,0
+NIR-2026-00539,Ramon,Perez,Cadiz City,0
+NIR-2026-00540,Pedro,Castillo,Moises Padilla,0
+NIR-2026-00541,Alberto,Reyes,Tayasan,0
+NIR-2026-00542,Carmen,Gomez,Moises Padilla,0
+NIR-2026-00543,Rosa,Flores,Sagay City,0
+NIR-2026-00544,Eduardo,Espinosa,Dumaguete City,0
+NIR-2026-00545,Fernando,Perez,Manapla,0
+NIR-2026-00546,Alberto,Cuevas,Dauin,0
+NIR-2026-00547,Jose,Morales,Valencia,0
+NIR-2026-00548,Jose,Silva,Mabinay,0
+NIR-2026-00549,Rosario,Luna,Bacong,0
+NIR-2026-00550,Roberto,Silva,Bais City,0
+NIR-2026-00551,Alberto,Romero,Sibulan,0
+NIR-2026-00552,Pablo,Cuevas,Escalante City,0
+NIR-2026-00553,Clara,Castro,Hinigaran,0
+NIR-2026-00554,Beatriz,Garcia,Manapla,0
+NIR-2026-00555,Gloria,Guerrero,Kabankalan City,0
+NIR-2026-00556,Clara,Mejia,Bayawan,0
+NIR-2026-00557,Margarita,Garcia,Murcia,0
+NIR-2026-00558,Victoria,Ramos,Calatrava,0
+NIR-2026-00559,Josefa,Vargas,Binalbagan,0
+NIR-2026-00560,Carmen,Castillo,Bais City,0
+NIR-2026-00561,Antonio,Gutierrez,Santa Catalina,0
+NIR-2026-00562,Pablo,Espinosa,Canlaon City,0
+NIR-2026-00563,Alejandro,Castillo,Isabela,0
+NIR-2026-00564,Juan,Hernandez,Escalante City,0
+NIR-2026-00565,Luis,Ramirez,Candoni,0
+NIR-2026-00566,Esperanza,Hernandez,Salvador Benedicto,1
+NIR-2026-00567,Clara,Ocampo,Himamaylan City,0
+NIR-2026-00568,Ana,Ruiz,Pamplona,0
+NIR-2026-00569,Teresa,Garcia,Silay City,0
+NIR-2026-00570,Mercedes,Lopez,San Carlos City,0
+NIR-2026-00571,Diego,Navarro,Siaton,0
+NIR-2026-00572,Consuelo,Garcia,Pamplona,0
+NIR-2026-00573,Raul,Romero,Sagay City,0
+NIR-2026-00574,Roberto,Guerrero,Ayungon,0
+NIR-2026-00575,Miguel,Ocampo,Canlaon City,0
+NIR-2026-00576,Gloria,Vargas,Bacolod City,0
+NIR-2026-00577,Miguel,Ramirez,Calatrava,0
+NIR-2026-00578,Pedro,Jimenez,Bacolod City,0
+NIR-2026-00579,Pilar,Ruiz,Mabinay,0
+NIR-2026-00580,Patricia,Romero,Tayasan,0
+NIR-2026-00581,Maria,Reyes,Sibulan,0
+NIR-2026-00582,Esperanza,Cuevas,Bayawan,0
+NIR-2026-00583,Alberto,Navarro,Toboso,0
+NIR-2026-00584,Ricardo,Vega,La Libertad,0
+NIR-2026-00585,Rosario,Lopez,Victorias City,0
+NIR-2026-00586,Rosa,Delgado,La Libertad,0
+NIR-2026-00587,Pilar,Jimenez,Zamboanguita,0
+NIR-2026-00588,Alejandro,Jimenez,Canlaon City,0
+NIR-2026-00589,Mercedes,Mejia,Sibulan,0
+NIR-2026-00590,Alberto,Navarro,Escalante City,0
+NIR-2026-00591,Pilar,Jimenez,Victorias City,0
+NIR-2026-00592,Clara,Torres,Bayawan,0
+NIR-2026-00593,Manuel,Campos,Candoni,0
+NIR-2026-00594,Sergio,Salazar,La Libertad,0
+NIR-2026-00595,Sergio,Espinosa,Santa Catalina,0
+NIR-2026-00596,Ana,Alvarez,Bacong,0
+NIR-2026-00597,Teresa,Ayala,Dauin,1
+NIR-2026-00598,Luz,Flores,Kabankalan City,0
+NIR-2026-00599,Roberto,Ramos,Victorias City,1
+NIR-2026-00600,Fernando,Delgado,Escalante City,0
+NIR-2026-00601,Consuelo,Gonzales,Escalante City,0
+NIR-2026-00602,Alberto,Aguilar,Bacolod City,0
+NIR-2026-00603,Maria,Hernandez,Vallehermoso,0
+NIR-2026-00604,Pedro,Medina,Canlaon City,0
+NIR-2026-00605,Sofia,Luna,San Carlos City,0
+NIR-2026-00606,Margarita,Cuevas,Hinoba-an,0
+NIR-2026-00607,Ramon,Garcia,Canlaon City,0
+NIR-2026-00608,Beatriz,Lopez,La Castellana,0
+NIR-2026-00609,Gloria,Romero,Bacolod City,0
+NIR-2026-00610,Enrique,Medina,Sipalay City,1
+NIR-2026-00611,Cristina,Delgado,Santa Catalina,0
+NIR-2026-00612,Gabriel,Ocampo,La Castellana,0
+NIR-2026-00613,Gloria,Gomez,Bago City,0
+NIR-2026-00614,Gabriel,Alvarez,San Jose,0
+NIR-2026-00615,Patricia,Bautista,Isabela,0
+NIR-2026-00616,Manuel,Ramirez,Moises Padilla,0
+NIR-2026-00617,Elena,Ayala,Valencia,0
+NIR-2026-00618,Pilar,Guerrero,Sipalay City,0
+NIR-2026-00619,Francisco,Mejia,Moises Padilla,0
+NIR-2026-00620,Gloria,Ayala,Talisay City,0
+NIR-2026-00621,Maria,Diaz,Isabela,0
+NIR-2026-00622,Patricia,Reyes,Jimalalud,1
+NIR-2026-00623,Diego,Espinosa,Tanjay City,0
+NIR-2026-00624,Pilar,Ruiz,Salvador Benedicto,0
+NIR-2026-00625,Pilar,Cruz,Bacong,0
+NIR-2026-00626,Ricardo,Torres,Manapla,0
+NIR-2026-00627,Sergio,Rivera,Ayungon,0
+NIR-2026-00628,Elena,Delgado,Bacong,0
+NIR-2026-00629,Esperanza,Ramos,La Carlota City,0
+NIR-2026-00630,Rosa,Moreno,Kabankalan City,0
+NIR-2026-00631,Gabriel,Gonzales,Sibulan,0
+NIR-2026-00632,Consuelo,Cuevas,Tayasan,0
+NIR-2026-00633,Esperanza,Moreno,Candoni,0
+NIR-2026-00634,Alejandro,Cuevas,Sagay City,0
+NIR-2026-00635,Ramon,Castillo,Moises Padilla,0
+NIR-2026-00636,Isabel,Espinosa,Bacong,0
+NIR-2026-00637,Fernando,Castro,Dauin,0
+NIR-2026-00638,Gabriel,Cordero,Isabela,0
+NIR-2026-00639,Alberto,Ramos,Tayasan,0
+NIR-2026-00640,Sergio,Ruiz,Santa Catalina,0
+NIR-2026-00641,Francisco,Sanchez,Kabankalan City,0
+NIR-2026-00642,Maria,Delgado,Tayasan,0
+NIR-2026-00643,Elena,Ayala,Hinigaran,0
+NIR-2026-00644,Miguel,Bautista,Candoni,0
+NIR-2026-00645,Diego,Reyes,Manjuyod,0
+NIR-2026-00646,Josefa,Gutierrez,Bindoy,0
+NIR-2026-00647,Jose,Medina,Isabela,0
+NIR-2026-00648,Sofia,Reyes,Murcia,0
+NIR-2026-00649,Miguel,Castillo,Dauin,0
+NIR-2026-00650,Enrique,Espinosa,Bago City,0
+NIR-2026-00651,Pilar,Medina,Salvador Benedicto,0
+NIR-2026-00652,Francisco,Silva,Talisay City,0
+NIR-2026-00653,Alfonso,Mendoza,Binalbagan,0
+NIR-2026-00654,Pilar,Ramos,Bacong,0
+NIR-2026-00655,Cristina,Espinosa,Manapla,0
+NIR-2026-00656,Juan,Castro,San Carlos City,0
+NIR-2026-00657,Carmen,Vargas,Valencia,0
+NIR-2026-00658,Elena,Ramirez,Valladolid,0
+NIR-2026-00659,Jorge,Navarro,Escalante City,0
+NIR-2026-00660,Margarita,Torres,Bago City,0
+NIR-2026-00661,Rosario,Aguilar,Guihulngan City,0
+NIR-2026-00662,Alejandro,Reyes,Pamplona,1
+NIR-2026-00663,Carmen,Luna,Cauayan,0
+NIR-2026-00664,Isabel,Sanchez,Jimalalud,0
+NIR-2026-00665,Jorge,Romero,Tanjay City,0
+NIR-2026-00666,Diego,Moreno,Moises Padilla,0
+NIR-2026-00667,Elena,Jimenez,Dauin,0
+NIR-2026-00668,Dolores,Cordero,Sibulan,0
+NIR-2026-00669,Mercedes,Romero,Bacong,0
+NIR-2026-00670,Diego,Luna,Mabinay,0
+NIR-2026-00671,Consuelo,Rivera,Manapla,0
+NIR-2026-00672,Teresa,Herrera,Kabankalan City,0
+NIR-2026-00673,Margarita,Castillo,Salvador Benedicto,0
+NIR-2026-00674,Juan,Castro,Bindoy,0
+NIR-2026-00675,Angela,Ortiz,Siaton,0
+NIR-2026-00676,Carlos,Lopez,Himamaylan City,0
+NIR-2026-00677,Alfonso,Gutierrez,San Enrique,0
+NIR-2026-00678,Pablo,Hernandez,Santa Catalina,0
+NIR-2026-00679,Roberto,Navarro,Bayawan,0
+NIR-2026-00680,Rosa,Castillo,La Carlota City,0
+NIR-2026-00681,Gloria,Ramirez,Canlaon City,0
+NIR-2026-00682,Angela,Guerrero,Siaton,0
+NIR-2026-00683,Carmen,Ayala,Escalante City,0
+NIR-2026-00684,Pedro,Perez,Silay City,1
+NIR-2026-00685,Clara,Vega,Bacolod City,0
+NIR-2026-00686,Gabriel,Ortiz,Bacong,0
+NIR-2026-00687,Raul,Cruz,Cauayan,0
+NIR-2026-00688,Clara,Ocampo,Escalante City,0
+NIR-2026-00689,Rosario,Salazar,La Carlota City,0
+NIR-2026-00690,Eduardo,Moreno,Calatrava,0
+NIR-2026-00691,Elena,Cruz,Santa Catalina,0
+NIR-2026-00692,Carlos,Herrera,Amlan,0
+NIR-2026-00693,Rosa,Jimenez,Manjuyod,0
+NIR-2026-00694,Mercedes,Silva,Kabankalan City,0
+NIR-2026-00695,Jorge,Ayala,Tayasan,0
+NIR-2026-00696,Javier,Flores,Isabela,0
+NIR-2026-00697,Luz,Vargas,Manapla,0
+NIR-2026-00698,Javier,Espinosa,Jimalalud,0
+NIR-2026-00699,Luz,Gutierrez,Cadiz City,0
+NIR-2026-00700,Cecilia,Morales,La Castellana,0
+NIR-2026-00701,Clara,Romero,Pontevedra,0
+NIR-2026-00702,Pablo,Sanchez,Binalbagan,0
+NIR-2026-00703,Clara,Ruiz,Valladolid,0
+NIR-2026-00704,Carmen,Vega,Manjuyod,0
+NIR-2026-00705,Dolores,Castro,Cauayan,0
+NIR-2026-00706,Teresa,Guerrero,Silay City,0
+NIR-2026-00707,Jorge,Cruz,La Carlota City,0
+NIR-2026-00708,Gabriel,Cruz,Canlaon City,0
+NIR-2026-00709,Margarita,Ortiz,Escalante City,0
+NIR-2026-00710,Alejandro,Ocampo,Calatrava,0
+NIR-2026-00711,Elena,Gutierrez,Sipalay City,0
+NIR-2026-00712,Juan,Delgado,Escalante City,0
+NIR-2026-00713,Manuel,Vargas,Bacong,0
+NIR-2026-00714,Miguel,Lopez,La Libertad,0
+NIR-2026-00715,Rosa,Campos,Cadiz City,1
+NIR-2026-00716,Teresa,Silva,Binalbagan,0
+NIR-2026-00717,Diego,Perez,La Castellana,0
+NIR-2026-00718,Carlos,Santos,Candoni,0
+NIR-2026-00719,Pedro,Hernandez,Bago City,0
+NIR-2026-00720,Juan,Ortiz,Ayungon,0
+NIR-2026-00721,Pilar,Lopez,Bindoy,0
+NIR-2026-00722,Francisco,Gonzales,Zamboanguita,0
+NIR-2026-00723,Maria,Navarro,Ilog,0
+NIR-2026-00724,Luis,Delgado,Talisay City,0
+NIR-2026-00725,Dolores,Morales,Mabinay,0
+NIR-2026-00726,Raul,Flores,Jimalalud,0
+NIR-2026-00727,Sofia,Lopez,Pulupandan,1
+NIR-2026-00728,Patricia,Flores,Moises Padilla,0
+NIR-2026-00729,Esperanza,Ruiz,Jimalalud,0
+NIR-2026-00730,Josefa,Fernandez,Victorias City,0
+NIR-2026-00731,Josefa,Castillo,Tayasan,0
+NIR-2026-00732,Eduardo,Castro,Basay,0
+NIR-2026-00733,Francisco,Cuevas,Tayasan,0
+NIR-2026-00734,Luz,Ramos,Dauin,0
+NIR-2026-00735,Margarita,Garcia,Mabinay,1
+NIR-2026-00736,Patricia,Ayala,Salvador Benedicto,0
+NIR-2026-00737,Carmen,Fernandez,Sagay City,0
+NIR-2026-00738,Dolores,Jimenez,Ilog,0
+NIR-2026-00739,Jorge,Alvarez,Bais City,0
+NIR-2026-00740,Teresa,Santos,Tayasan,0
+NIR-2026-00741,Teresa,Morales,Manapla,0
+NIR-2026-00742,Luis,Espinosa,Hinigaran,0
+NIR-2026-00743,Miguel,Bautista,Calatrava,0
+NIR-2026-00744,Carlos,Morales,Bayawan,0
+NIR-2026-00745,Cecilia,Castillo,Pulupandan,0
+NIR-2026-00746,Rosario,Bautista,Toboso,0
+NIR-2026-00747,Josefa,Luna,Kabankalan City,0
+NIR-2026-00748,Ana,Torres,Tayasan,0
+NIR-2026-00749,Mercedes,Ruiz,Kabankalan City,0
+NIR-2026-00750,Fernando,Torres,Toboso,0
+NIR-2026-00751,Elena,Luna,Bacong,0
+NIR-2026-00752,Margarita,Marquez,Guihulngan City,0
+NIR-2026-00753,Rosa,Castillo,San Enrique,0
+NIR-2026-00754,Patricia,Guerrero,Calatrava,0
+NIR-2026-00755,Jose,Sanchez,Escalante City,0
+NIR-2026-00756,Luz,Gutierrez,Isabela,0
+NIR-2026-00757,Cristina,Ortiz,Dauin,0
+NIR-2026-00758,Consuelo,Ramos,Ilog,0
+NIR-2026-00759,Gabriel,Garcia,Valencia,0
+NIR-2026-00760,Miguel,Moreno,Ayungon,0
+NIR-2026-00761,Ricardo,Lopez,Salvador Benedicto,1
+NIR-2026-00762,Pablo,Rivera,Ayungon,1
+NIR-2026-00763,Pedro,Vargas,San Carlos City,1
+NIR-2026-00764,Francisco,Delgado,Hinigaran,1
+NIR-2026-00765,Roberto,Castillo,Sagay City,0
+NIR-2026-00766,Antonio,Bautista,Canlaon City,0
+NIR-2026-00767,Clara,Reyes,Sipalay City,0
+NIR-2026-00768,Ana,Vega,Enrique B. Magalona,0
+NIR-2026-00769,Enrique,Vega,Isabela,0
+NIR-2026-00770,Antonio,Chavez,Toboso,0
+NIR-2026-00771,Luis,Gomez,Dumaguete City,0
+NIR-2026-00772,Gabriel,Diaz,Santa Catalina,0
+NIR-2026-00773,Jose,Delgado,Sagay City,0
+NIR-2026-00774,Maria,Ocampo,Talisay City,0
+NIR-2026-00775,Jorge,Alvarez,La Libertad,0
+NIR-2026-00776,Antonio,Jimenez,Sipalay City,0
+NIR-2026-00777,Victoria,Cuevas,Tanjay City,0
+NIR-2026-00778,Miguel,Alvarez,Tayasan,0
+NIR-2026-00779,Sergio,Silva,Santa Catalina,0
+NIR-2026-00780,Dolores,Salazar,Pontevedra,0
+NIR-2026-00781,Javier,Gomez,Pontevedra,0
+NIR-2026-00782,Dolores,Mejia,La Carlota City,0
+NIR-2026-00783,Carlos,Lopez,Jimalalud,0
+NIR-2026-00784,Alejandro,Ramos,Siaton,0
+NIR-2026-00785,Gloria,Cordero,Binalbagan,0
+NIR-2026-00786,Gabriel,Mejia,Dumaguete City,0
+NIR-2026-00787,Roberto,Alvarez,Manapla,0
+NIR-2026-00788,Jose,Herrera,Bayawan,0
+NIR-2026-00789,Victoria,Cruz,Talisay City,0
+NIR-2026-00790,Teresa,Santos,Valencia,0
+NIR-2026-00791,Javier,Gonzales,Pamplona,0
+NIR-2026-00792,Ramon,Morales,Binalbagan,0
+NIR-2026-00793,Ana,Guerrero,Bacolod City,0
+NIR-2026-00794,Jorge,Alvarez,Valencia,1
+NIR-2026-00795,Enrique,Campos,Murcia,0
+NIR-2026-00796,Patricia,Salazar,Hinigaran,0
+NIR-2026-00797,Miguel,Gutierrez,Pontevedra,0
+NIR-2026-00798,Mercedes,Rivera,Zamboanguita,0
+NIR-2026-00799,Jose,Rivera,Valladolid,0
+NIR-2026-00800,Gabriel,Diaz,Valencia,0
+NIR-2026-00801,Rosa,Marquez,Santa Catalina,0
+NIR-2026-00802,Maria,Gomez,San Carlos City,0
+NIR-2026-00803,Alejandro,Fernandez,Guihulngan City,0
+NIR-2026-00804,Ramon,Ruiz,Amlan,0
+NIR-2026-00805,Ana,Vargas,Himamaylan City,0
+NIR-2026-00806,Enrique,Hernandez,Candoni,0
+NIR-2026-00807,Rosario,Ortiz,Dauin,0
+NIR-2026-00808,Ana,Gutierrez,Bayawan,0
+NIR-2026-00809,Luz,Ortiz,Santa Catalina,0
+NIR-2026-00810,Cristina,Marquez,Ilog,0
+NIR-2026-00811,Ramon,Mejia,Sibulan,0
+NIR-2026-00812,Ramon,Guerrero,Calatrava,0
+NIR-2026-00813,Rosario,Gomez,Cauayan,0
+NIR-2026-00814,Alejandro,Alvarez,La Libertad,0
+NIR-2026-00815,Patricia,Salazar,Candoni,0
+NIR-2026-00816,Sergio,Ocampo,Valencia,0
+NIR-2026-00817,Pablo,Mejia,Talisay City,0
+NIR-2026-00818,Fernando,Hernandez,San Enrique,0
+NIR-2026-00819,Josefa,Ayala,Silay City,0
+NIR-2026-00820,Jose,Luna,Valladolid,0
+NIR-2026-00821,Sergio,Herrera,Silay City,0
+NIR-2026-00822,Rosario,Alvarez,Valencia,0
+NIR-2026-00823,Luis,Ramirez,Tanjay City,0
+NIR-2026-00824,Raul,Ayala,Sibulan,1
+NIR-2026-00825,Raul,Lopez,Vallehermoso,0
+NIR-2026-00826,Gloria,Sanchez,Murcia,0
+NIR-2026-00827,Elena,Morales,Bacong,0
+NIR-2026-00828,Ramon,Cuevas,Enrique B. Magalona,0
+NIR-2026-00829,Clara,Torres,Dumaguete City,0
+NIR-2026-00830,Alejandro,Diaz,Canlaon City,0
+NIR-2026-00831,Carlos,Moreno,Tayasan,0
+NIR-2026-00832,Enrique,Gomez,Ilog,0
+NIR-2026-00833,Javier,Rivera,Candoni,0
+NIR-2026-00834,Maria,Ramos,Pulupandan,0
+NIR-2026-00835,Elena,Chavez,San Carlos City,0
+NIR-2026-00836,Pilar,Mejia,Santa Catalina,0
+NIR-2026-00837,Juan,Perez,Murcia,1
+NIR-2026-00838,Angela,Herrera,San Carlos City,0
+NIR-2026-00839,Jorge,Aguilar,Vallehermoso,0
+NIR-2026-00840,Ricardo,Mendoza,Guihulngan City,0
+NIR-2026-00841,Carmen,Guerrero,Valencia,0
+NIR-2026-00842,Sergio,Rivera,Bago City,0
+NIR-2026-00843,Raul,Delgado,Manapla,0
+NIR-2026-00844,Gloria,Cordero,San Enrique,0
+NIR-2026-00845,Enrique,Lopez,Pulupandan,0
+NIR-2026-00846,Cristina,Guerrero,Candoni,0
+NIR-2026-00847,Gloria,Herrera,Bacong,0
+NIR-2026-00848,Cecilia,Reyes,Sipalay City,0
+NIR-2026-00849,Mercedes,Perez,Dumaguete City,0
+NIR-2026-00850,Rosa,Vega,San Enrique,0
+NIR-2026-00851,Margarita,Vargas,Siaton,0
+NIR-2026-00852,Esperanza,Hernandez,Sagay City,0
+NIR-2026-00853,Antonio,Castillo,San Jose,0
+NIR-2026-00854,Consuelo,Castillo,Escalante City,0
+NIR-2026-00855,Gabriel,Gomez,Ilog,0
+NIR-2026-00856,Javier,Perez,Valencia,0
+NIR-2026-00857,Ana,Gutierrez,Toboso,0
+NIR-2026-00858,Enrique,Gutierrez,Pamplona,0
+NIR-2026-00859,Francisco,Cuevas,Santa Catalina,0
+NIR-2026-00860,Beatriz,Chavez,Enrique B. Magalona,0
+NIR-2026-00861,Pedro,Navarro,Hinoba-an,0
+NIR-2026-00862,Ricardo,Castro,Sipalay City,0
+NIR-2026-00863,Gabriel,Ayala,Bacolod City,0
+NIR-2026-00864,Dolores,Navarro,Santa Catalina,0
+NIR-2026-00865,Jose,Luna,Canlaon City,0
+NIR-2026-00866,Jose,Silva,Toboso,0
+NIR-2026-00867,Diego,Medina,Tayasan,0
+NIR-2026-00868,Francisco,Reyes,Kabankalan City,0
+NIR-2026-00869,Ramon,Ocampo,Manapla,0
+NIR-2026-00870,Margarita,Romero,Binalbagan,0
+NIR-2026-00871,Patricia,Reyes,San Jose,0
+NIR-2026-00872,Roberto,Romero,La Castellana,0
+NIR-2026-00873,Raul,Sanchez,Tanjay City,0
+NIR-2026-00874,Cecilia,Lopez,Moises Padilla,0
+NIR-2026-00875,Luis,Medina,Zamboanguita,0
+NIR-2026-00876,Victoria,Fernandez,Manapla,0
+NIR-2026-00877,Javier,Navarro,La Carlota City,0
+NIR-2026-00878,Dolores,Ocampo,Mabinay,0
+NIR-2026-00879,Ana,Vega,Tanjay City,0
+NIR-2026-00880,Pilar,Campos,Valladolid,0
+NIR-2026-00881,Sofia,Jimenez,Siaton,0
+NIR-2026-00882,Francisco,Ocampo,Talisay City,0
+NIR-2026-00883,Carmen,Navarro,Pamplona,0
+NIR-2026-00884,Clara,Ortiz,Guihulngan City,0
+NIR-2026-00885,Teresa,Ruiz,Talisay City,0
+NIR-2026-00886,Pedro,Rivera,Isabela,0
+NIR-2026-00887,Javier,Ortiz,Cauayan,0
+NIR-2026-00888,Rosa,Torres,Cadiz City,0
+NIR-2026-00889,Isabel,Perez,Pontevedra,0
+NIR-2026-00890,Ana,Espinosa,Hinigaran,0
+NIR-2026-00891,Cristina,Bautista,Pulupandan,0
+NIR-2026-00892,Javier,Alvarez,Victorias City,0
+NIR-2026-00893,Gloria,Gutierrez,Tanjay City,0
+NIR-2026-00894,Victoria,Navarro,Cauayan,0
+NIR-2026-00895,Luis,Rivera,Amlan,0
+NIR-2026-00896,Sofia,Delgado,Valladolid,0
+NIR-2026-00897,Manuel,Perez,Zamboanguita,0
+NIR-2026-00898,Maria,Gonzales,San Carlos City,0
+NIR-2026-00899,Ricardo,Silva,Bayawan,1
+NIR-2026-00900,Teresa,Gomez,Zamboanguita,0
+NIR-2026-00901,Angela,Jimenez,Guihulngan City,0
+NIR-2026-00902,Luis,Romero,Pamplona,0
+NIR-2026-00903,Roberto,Ramos,Binalbagan,0
+NIR-2026-00904,Rosa,Cruz,Valencia,0
+NIR-2026-00905,Consuelo,Navarro,Valencia,0
+NIR-2026-00906,Luis,Guerrero,Calatrava,0
+NIR-2026-00907,Rosario,Navarro,Silay City,0
+NIR-2026-00908,Angela,Santos,Tanjay City,1
+NIR-2026-00909,Francisco,Alvarez,Sipalay City,0
+NIR-2026-00910,Gloria,Diaz,La Castellana,0
+NIR-2026-00911,Sofia,Moreno,Hinoba-an,0
+NIR-2026-00912,Victoria,Campos,Canlaon City,0
+NIR-2026-00913,Francisco,Flores,Silay City,0
+NIR-2026-00914,Rosa,Santos,Ilog,0
+NIR-2026-00915,Ana,Herrera,Cadiz City,0
+NIR-2026-00916,Clara,Mejia,La Castellana,0
+NIR-2026-00917,Carlos,Marquez,Pulupandan,0
+NIR-2026-00918,Patricia,Hernandez,Hinigaran,0
+NIR-2026-00919,Sofia,Ocampo,Isabela,0
+NIR-2026-00920,Alejandro,Mendoza,Bayawan,0
+NIR-2026-00921,Antonio,Chavez,Zamboanguita,0
+NIR-2026-00922,Mercedes,Perez,Cauayan,0
+NIR-2026-00923,Juan,Torres,Dauin,0
+NIR-2026-00924,Clara,Marquez,Himamaylan City,0
+NIR-2026-00925,Luz,Delgado,Vallehermoso,0
+NIR-2026-00926,Josefa,Santos,Victorias City,0
+NIR-2026-00927,Beatriz,Cuevas,Ayungon,0
+NIR-2026-00928,Eduardo,Silva,Sagay City,0
+NIR-2026-00929,Angela,Moreno,Sipalay City,0
+NIR-2026-00930,Maria,Medina,San Carlos City,0
+NIR-2026-00931,Luz,Espinosa,Ilog,0
+NIR-2026-00932,Diego,Ocampo,Bais City,1
+NIR-2026-00933,Alejandro,Ayala,Ilog,0
+NIR-2026-00934,Rosario,Jimenez,Bago City,0
+NIR-2026-00935,Alberto,Delgado,Bacong,0
+NIR-2026-00936,Rosa,Romero,Isabela,0
+NIR-2026-00937,Francisco,Perez,Bindoy,0
+NIR-2026-00938,Isabel,Gonzales,Cauayan,0
+NIR-2026-00939,Ana,Castillo,Manapla,0
+NIR-2026-00940,Alejandro,Jimenez,Bayawan,0
+NIR-2026-00941,Javier,Campos,Pulupandan,0
+NIR-2026-00942,Cristina,Cruz,Pamplona,0
+NIR-2026-00943,Antonio,Moreno,Bacong,0
+NIR-2026-00944,Francisco,Bautista,San Enrique,0
+NIR-2026-00945,Ricardo,Diaz,Bais City,0
+NIR-2026-00946,Alberto,Jimenez,Escalante City,0
+NIR-2026-00947,Elena,Espinosa,Amlan,0
+NIR-2026-00948,Roberto,Ortiz,Jimalalud,0
+NIR-2026-00949,Carmen,Rivera,Silay City,0
+NIR-2026-00950,Angela,Rivera,Zamboanguita,0
+NIR-2026-00951,Victoria,Reyes,Hinoba-an,0
+NIR-2026-00952,Victoria,Sanchez,Bago City,0
+NIR-2026-00953,Patricia,Moreno,Hinigaran,0
+NIR-2026-00954,Miguel,Mejia,La Libertad,0
+NIR-2026-00955,Ramon,Flores,Talisay City,0
+NIR-2026-00956,Roberto,Gonzales,Dauin,1
+NIR-2026-00957,Beatriz,Ruiz,Isabela,0
+NIR-2026-00958,Teresa,Ortiz,Talisay City,0
+NIR-2026-00959,Enrique,Torres,Canlaon City,0
+NIR-2026-00960,Esperanza,Castro,Murcia,0
+NIR-2026-00961,Alberto,Romero,Talisay City,0
+NIR-2026-00962,Gloria,Romero,Amlan,0
+NIR-2026-00963,Rosa,Alvarez,Sagay City,0
+NIR-2026-00964,Alejandro,Ayala,Tanjay City,0
+NIR-2026-00965,Isabel,Castillo,Cadiz City,0
+NIR-2026-00966,Alejandro,Ruiz,Canlaon City,0
+NIR-2026-00967,Ricardo,Herrera,Zamboanguita,0
+NIR-2026-00968,Gabriel,Lopez,Enrique B. Magalona,1
+NIR-2026-00969,Beatriz,Chavez,Calatrava,0
+NIR-2026-00970,Pilar,Ocampo,Guihulngan City,0
+NIR-2026-00971,Francisco,Gutierrez,Zamboanguita,0
+NIR-2026-00972,Alfonso,Ramos,Moises Padilla,0
+NIR-2026-00973,Gloria,Romero,Jimalalud,0
+NIR-2026-00974,Miguel,Perez,Moises Padilla,0
+NIR-2026-00975,Fernando,Santos,Guihulngan City,0
+NIR-2026-00976,Margarita,Cruz,Sibulan,0
+NIR-2026-00977,Roberto,Gutierrez,Guihulngan City,0
+NIR-2026-00978,Miguel,Ruiz,Cadiz City,0
+NIR-2026-00979,Mercedes,Espinosa,Sagay City,0
+NIR-2026-00980,Juan,Gutierrez,Toboso,0
+NIR-2026-00981,Pablo,Ruiz,Isabela,1
+NIR-2026-00982,Sergio,Alvarez,Silay City,0
+NIR-2026-00983,Javier,Morales,Salvador Benedicto,0
+NIR-2026-00984,Pedro,Vega,Enrique B. Magalona,0
+NIR-2026-00985,Clara,Castillo,San Jose,0
+NIR-2026-00986,Cecilia,Delgado,Guihulngan City,0
+NIR-2026-00987,Roberto,Cruz,Murcia,0
+NIR-2026-00988,Fernando,Alvarez,Dauin,0
+NIR-2026-00989,Fernando,Vega,La Castellana,0
+NIR-2026-00990,Patricia,Ruiz,La Castellana,1
+NIR-2026-00991,Alejandro,Diaz,Bayawan,0
+NIR-2026-00992,Francisco,Gomez,Binalbagan,0
+NIR-2026-00993,Pablo,Romero,Escalante City,0
+NIR-2026-00994,Beatriz,Ruiz,Tanjay City,0
+NIR-2026-00995,Esperanza,Ortiz,La Castellana,0
+NIR-2026-00996,Alfonso,Marquez,Bago City,0
+NIR-2026-00997,Consuelo,Fernandez,La Carlota City,0
+NIR-2026-00998,Roberto,Castro,Enrique B. Magalona,0
+NIR-2026-00999,Josefa,Flores,Dauin,0
+NIR-2026-01000,Luz,Gomez,San Enrique,0
