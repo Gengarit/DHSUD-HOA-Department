@@ -1,33 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Settings as SettingsIcon, Database, Shield, Info, MapPin } from 'lucide-react';
+import React from 'react';
+import { Settings as SettingsIcon, Database, Shield, Info } from 'lucide-react';
 
 const Settings = () => {
-  const [locations, setLocations] = useState([]);
-
-  useEffect(() => {
-    fetchLocations();
-  }, []);
-
-  const fetchLocations = async () => {
+  const handleExport = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/locations');
-      setLocations(response.data);
+      const response = await fetch('http://localhost:5000/api/export/hoas');
+      if (!response.ok) throw new Error('Export failed');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hoas_export_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
     } catch (error) {
-      console.error('Error fetching locations:', error);
+      console.error('Export error:', error);
     }
   };
 
-  const occidentCities = locations.filter(loc => 
-    ['Bacolod City', 'Bago City', 'Cadiz City', 'Escalante City', 'Himamaylan City',
-     'Kabankalan City', 'La Carlota City', 'Sagay City', 'San Carlos City', 'Silay City',
-     'Sipalay City', 'Talisay City', 'Victorias City'].includes(loc)
-  );
+  return (
+    <div className="p-8 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-white">Settings</h1>
+        <p className="text-[#9CA3AF] text-sm mt-1">System configuration and preferences</p>
+      </div>
 
-  const occidentMunicipalities = locations.filter(loc => 
-    ['Binalbagan', 'Calatrava', 'Candoni', 'Cauayan', 'Enrique B. Magalona',
-     'Hinigaran', 'Hinoba-an', 'Ilog', 'Isabela', 'La Castellana',
-     'Manapla', 'Moises Padilla', 'Murcia', 'Pontevedra', 'Pulupandan',
+      {/* System Information */}
+      <div className="bg-[#242B3D] border border-[#3A4A62] rounded-lg p-6">
      'Salvador Benedicto', 'San Enrique', 'Toboso', 'Valladolid'].includes(loc)
   );
 

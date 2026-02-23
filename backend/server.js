@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 const { createObjectCsvWriter } = require('csv-writer');
-const csv = require('csv-parser');
+const readline = require('readline');
 const multer = require('multer');
 
 const app = express();
@@ -14,77 +14,13 @@ const PORT = 5000;
 // Multer configuration for file uploads
 const upload = multer({ dest: 'uploads/' });
 
-// NIR Cities and Municipalities
-const NIR_LOCATIONS = [
-  // Negros Occidental
-  'Bacolod City', 'Bago City', 'Cadiz City', 'Escalante City', 'Himamaylan City',
-  'Kabankalan City', 'La Carlota City', 'Sagay City', 'San Carlos City', 'Silay City',
-  'Sipalay City', 'Talisay City', 'Victorias City',
-  // Negros Oriental
-  'Dumaguete City', 'Bais City', 'Canlaon City', 'Guihulngan City', 'Tanjay City',
-  // Municipalities - Negros Occidental
-  'Binalbagan', 'Calatrava', 'Candoni', 'Cauayan', 'Enrique B. Magalona',
-  'Hinigaran', 'Hinoba-an', 'Ilog', 'Isabela', 'La Castellana',
-  'Manapla', 'Moises Padilla', 'Murcia', 'Pontevedra', 'Pulupandan',
-  'Salvador Benedicto', 'San Enrique', 'Toboso', 'Valladolid',
-  // Municipalities - Negros Oriental
-  'Amlan', 'Ayungon', 'Bacong', 'Basay', 'Bayawan',
-  'Bindoy', 'Dauin', 'Jimalalud', 'La Libertad', 'Mabinay',
-  'Manjuyod', 'Pamplona', 'San Jose', 'Santa Catalina', 'Siaton',
-  'Sibulan', 'Tayasan', 'Valencia', 'Vallehermoso', 'Zamboanguita'
-];
-
-// Input Validation Functions
-function validateControlNumber(controlNumber) {
-  if (!controlNumber || typeof controlNumber !== 'string') {
-    return { valid: false, error: 'Control number is required' };
-  }
-  
-  const trimmed = controlNumber.trim();
-  if (trimmed.length < 5 || trimmed.length > 20) {
-    return { valid: false, error: 'Control number must be 5-20 characters' };
-  }
-  
-  // Only allow alphanumeric and hyphens
-  const regex = /^[A-Z0-9-]+$/i;
-  if (!regex.test(trimmed)) {
-    return { valid: false, error: 'Control number can only contain letters, numbers, and hyphens' };
-  }
-  
-  return { valid: true, value: trimmed.toUpperCase() };
-}
-
-function validateName(name, fieldName) {
-  if (!name || typeof name !== 'string') {
-    return { valid: false, error: `${fieldName} is required` };
-  }
-  
-  const trimmed = name.trim();
-  if (trimmed.length < 2 || trimmed.length > 50) {
-    return { valid: false, error: `${fieldName} must be 2-50 characters` };
-  }
-  
-  // Only allow letters, spaces, dots, and hyphens (including Ñ)
-  const regex = /^[A-Za-zÑñ.\s-]+$/;
-  if (!regex.test(trimmed)) {
-    return { valid: false, error: `${fieldName} can only contain letters, spaces, dots, and hyphens` };
-  }
-  
-  return { valid: true, value: trimmed };
-}
-
-function sanitizeInput(text) {
-  if (typeof text !== 'string') return text;
-  // Remove any potential SQL injection or XSS attempts
-  return text.trim().replace(/[<>]/g, '');
-}
-
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Database Setup
-const dbPath = path.join(__dirname, 'dhsud.db');
+const dbPath = path.join(__dirname, 'dhsud_hoa.db');
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
@@ -96,1202 +32,1009 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Initialize Database Schema
 function initializeDatabase() {
-  // Check if we need to migrate the old schema
-  db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='applicants'", [], (err, row) => {
-    if (err) {
-      console.error('Error checking table schema:', err.message);
-      return;
-    }
-    
-    if (!row) {
-      // Table doesn't exist, create it
-      console.log('Creating new database schema...');
-      createTable();
-      return;
-    }
-
-    db.all('PRAGMA table_info(applicants)', [], (infoErr, columns) => {
-      if (infoErr) {
-        console.error('Error checking applicants columns:', infoErr.message);
-        return;
-      }
-
-      const existing = new Set(columns.map((col) => col.name));
-      const required = ['is_archived', 'archived_at', 'status', 'created_at', 'updated_at'];
-      const missing = required.some((name) => !existing.has(name));
-
-      if (missing) {
-        console.log('Upgrading database schema with new features...');
-        addArchiveSupport();
-      } else {
-        console.log('Database schema is up to date');
-      }
-    });
-  });
-}
-
-function createTable() {
   db.serialize(() => {
-    // Applicants table
-    const createApplicantsQuery = `
-      CREATE TABLE IF NOT EXISTS applicants (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        control_number TEXT UNIQUE NOT NULL,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        city TEXT NOT NULL,
-        is_blacklisted INTEGER DEFAULT 0 CHECK(is_blacklisted IN (0, 1)),
-        is_archived INTEGER DEFAULT 0 CHECK(is_archived IN (0, 1)),
-        status TEXT DEFAULT 'Pending' CHECK(status IN ('Pending', 'Under Review', 'Approved', 'Rejected', 'On Hold')),
-        archived_at DATETIME,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-    
-    db.run(createApplicantsQuery, (err) => {
-      if (err) {
-        console.error('Error creating applicants table:', err.message);
-      } else {
-        console.log('Applicants table created successfully');
-      }
-    });
-
-    // Users table
-    const createUsersQuery = `
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        role TEXT DEFAULT 'Editor' CHECK(role IN ('Admin', 'Editor', 'Viewer')),
+    // HOAs Table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS hoas (
+        cert_of_inc_no TEXT PRIMARY KEY,
+        hoa_name TEXT NOT NULL,
+        reg_type TEXT,
+        issuance_date DATE,
+        classification TEXT,
+        barangay TEXT,
+        city_municipality TEXT,
+        province TEXT,
+        contact_person TEXT,
+        contact_details TEXT,
+        total_members INTEGER,
+        date_of_election DATE,
+        term_of_office TEXT,
+        status_findings TEXT,
+        evaluator_name TEXT,
+        date_last_update DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
-    `;
-    
-    db.run(createUsersQuery, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating users table:', err.message);
-      }
+    `, (err) => {
+      if (err) console.error('Error creating hoas table:', err);
+      else console.log('✓ HOAs table ready');
     });
 
-    // Activity Log table
-    const createActivityLogQuery = `
-      CREATE TABLE IF NOT EXISTS activity_log (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        applicant_id INTEGER,
-        action TEXT NOT NULL,
-        details TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(user_id) REFERENCES users(id),
-        FOREIGN KEY(applicant_id) REFERENCES applicants(id)
-      )
-    `;
-    
-    db.run(createActivityLogQuery, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating activity_log table:', err.message);
-      }
-    });
-
-    // Comments table
-    const createCommentsQuery = `
-      CREATE TABLE IF NOT EXISTS comments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        applicant_id INTEGER,
-        comment TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(user_id) REFERENCES users(id),
-        FOREIGN KEY(applicant_id) REFERENCES applicants(id)
-      )
-    `;
-    
-    db.run(createCommentsQuery, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating comments table:', err.message);
-      }
-    });
-
-    // Documents table
-    const createDocumentsQuery = `
-      CREATE TABLE IF NOT EXISTS documents (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        applicant_id INTEGER NOT NULL,
-        file_name TEXT NOT NULL,
-        file_path TEXT NOT NULL,
-        file_type TEXT,
-        file_size INTEGER,
-        uploaded_by INTEGER,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(applicant_id) REFERENCES applicants(id),
-        FOREIGN KEY(uploaded_by) REFERENCES users(id)
-      )
-    `;
-    
-    db.run(createDocumentsQuery, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating documents table:', err.message);
-      }
-    });
-  });
-}
-
-function addArchiveSupport() {
-  db.serialize(() => {
-    db.run('ALTER TABLE applicants ADD COLUMN is_archived INTEGER DEFAULT 0 CHECK(is_archived IN (0, 1))', (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding is_archived column:', err.message);
-      }
-    });
-    
-    db.run('ALTER TABLE applicants ADD COLUMN archived_at DATETIME', (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding archived_at column:', err.message);
-      }
-    });
-
-    db.run('ALTER TABLE applicants ADD COLUMN status TEXT DEFAULT "Pending"', (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding status column:', err.message);
-      }
-    });
-
-    db.run('ALTER TABLE applicants ADD COLUMN created_at DATETIME', (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding created_at column:', err.message);
-      }
-    });
-
-    db.run('ALTER TABLE applicants ADD COLUMN updated_at DATETIME', (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding updated_at column:', err.message);
-      }
-    });
-
-    db.run(
-      'UPDATE applicants SET created_at = COALESCE(created_at, CURRENT_TIMESTAMP), updated_at = COALESCE(updated_at, CURRENT_TIMESTAMP)',
-      (err) => {
-        if (err) {
-          console.error('Error backfilling timestamps:', err.message);
-        } else {
-          console.log('Archive and new features support added successfully');
-        }
-      }
-    );
-
-    // Create other tables if they don't exist
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      role TEXT DEFAULT 'Editor' CHECK(role IN ('Admin', 'Editor', 'Viewer')),
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating users table:', err.message);
-      }
-    });
-
-    db.run(`CREATE TABLE IF NOT EXISTS activity_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      applicant_id INTEGER,
-      action TEXT NOT NULL,
-      details TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(user_id) REFERENCES users(id),
-      FOREIGN KEY(applicant_id) REFERENCES applicants(id)
-    )`, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating activity_log table:', err.message);
-      }
-    });
-
-    db.run(`CREATE TABLE IF NOT EXISTS comments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      applicant_id INTEGER,
-      comment TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(user_id) REFERENCES users(id),
-      FOREIGN KEY(applicant_id) REFERENCES applicants(id)
-    )`, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating comments table:', err.message);
-      }
-    });
-
-    db.run(`CREATE TABLE IF NOT EXISTS documents (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      applicant_id INTEGER NOT NULL,
-      file_name TEXT NOT NULL,
-      file_path TEXT NOT NULL,
-      file_type TEXT,
-      file_size INTEGER,
-      uploaded_by INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(applicant_id) REFERENCES applicants(id),
-      FOREIGN KEY(uploaded_by) REFERENCES users(id)
-    )`, (err) => {
-      if (err && !err.message.includes('already exists')) {
-        console.error('Error creating documents table:', err.message);
-      }
-    });
-  });
-}
-
-function migrateSchema() {
-  db.serialize(() => {
-    // Create new table without city constraint
+    // Legal Orders Table (NOV, OTP, OIAS)
     db.run(`
-      CREATE TABLE IF NOT EXISTS applicants_new (
+      CREATE TABLE IF NOT EXISTS legal_orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cert_of_inc_no TEXT NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('NOV', 'OTP', 'OIAS')),
         control_number TEXT UNIQUE NOT NULL,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        city TEXT NOT NULL,
-        is_blacklisted INTEGER DEFAULT 0 CHECK(is_blacklisted IN (0, 1)),
-        is_archived INTEGER DEFAULT 0 CHECK(is_archived IN (0, 1)),
-        status TEXT DEFAULT 'Pending' CHECK(status IN ('Pending', 'Under Review', 'Approved', 'Rejected', 'On Hold')),
-        archived_at DATETIME,
-        created_at DATETIME,
-        updated_at DATETIME
+        date_issued DATE,
+        violation_type TEXT,
+        violation_description TEXT,
+        evaluator TEXT,
+        status TEXT DEFAULT 'Active' CHECK(status IN ('Active', 'Under Appeal', 'Resolved', 'Dismissed')),
+        sanction_amount DECIMAL(10, 2),
+        effective_date DATE,
+        appeal_deadline DATE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(cert_of_inc_no) REFERENCES hoas(cert_of_inc_no)
       )
     `, (err) => {
-      if (err) {
-        console.error('Error creating new table:', err.message);
-        return;
-      }
+      if (err) console.error('Error creating legal_orders table:', err);
+      else console.log('✓ Legal Orders table ready');
     });
-    
-    // Copy data from old table to new table
+
+    // Appeals Table (Motion for Reconsideration)
     db.run(`
-      INSERT INTO applicants_new (id, control_number, first_name, last_name, city, is_blacklisted, status, archived_at, created_at, updated_at)
-      SELECT id, control_number, first_name, last_name, city, is_blacklisted, status, archived_at, created_at, updated_at FROM applicants
+      CREATE TABLE IF NOT EXISTS appeals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('MR')),
+        appeal_control_number TEXT UNIQUE NOT NULL,
+        date_filed DATE,
+        status TEXT DEFAULT 'Under Review' CHECK(status IN ('Under Review', 'Pending Hearing', 'Resolved - Denied', 'Resolved - Granted')),
+        grounds_for_appeal TEXT,
+        filing_date DATE,
+        hearing_date DATE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(order_id) REFERENCES legal_orders(id)
+      )
     `, (err) => {
-      if (err) {
-        console.error('Error copying data:', err.message);
-        return;
-      }
+      if (err) console.error('Error creating appeals table:', err);
+      else console.log('✓ Appeals table ready');
     });
-    
-    // Drop old table
-    db.run('DROP TABLE applicants', (err) => {
-      if (err) {
-        console.error('Error dropping old table:', err.message);
-        return;
-      }
-    });
-    
-    // Rename new table to applicants
-    db.run('ALTER TABLE applicants_new RENAME TO applicants', (err) => {
-      if (err) {
-        console.error('Error renaming table:', err.message);
-      } else {
-        console.log('✓ Schema migration completed - All NIR locations now supported!');
-      }
-    });
+
+    // Create indexes for performance
+    db.run(`CREATE INDEX IF NOT EXISTS idx_hoas_city ON hoas(city_municipality)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_legal_orders_cert ON legal_orders(cert_of_inc_no)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_legal_orders_type ON legal_orders(type)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_appeals_order ON appeals(order_id)`);
+
+    // Seed data if tables are empty
+    seedDatabase();
   });
 }
 
-// ========================
-// API ROUTES
-// ========================
-
-// GET all applicants (excluding archived)
-app.get('/api/applicants', (req, res) => {
-  const query = 'SELECT * FROM applicants WHERE is_archived = 0 ORDER BY id DESC';
-  
-  db.all(query, [], (err, rows) => {
+function seedDatabase() {
+  db.get('SELECT COUNT(*) as count FROM hoas', [], (err, row) => {
     if (err) {
-      return res.status(500).json({ error: err.message });
+      console.error('Error checking hoas table:', err);
+      return;
     }
-    // Convert is_blacklisted to boolean
-    const applicants = rows.map(row => ({
-      ...row,
-      is_blacklisted: row.is_blacklisted === 1,
-      is_archived: row.is_archived === 1
-    }));
-    res.json(applicants);
-  });
-});
 
-// GET all archived applicants
-app.get('/api/archived', (req, res) => {
-  const query = 'SELECT * FROM applicants WHERE is_archived = 1 ORDER BY archived_at DESC';
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    const applicants = rows.map(row => ({
-      ...row,
-      is_blacklisted: row.is_blacklisted === 1,
-      is_archived: row.is_archived === 1
-    }));
-    res.json(applicants);
-  });
-});
-
-// GET single applicant
-app.get('/api/applicants/:id', (req, res) => {
-  const query = 'SELECT * FROM applicants WHERE id = ?';
-  
-  db.get(query, [req.params.id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (!row) {
-      return res.status(404).json({ error: 'Applicant not found' });
-    }
-    row.is_blacklisted = row.is_blacklisted === 1;
-    res.json(row);
-  });
-});
-
-// POST new applicant
-app.post('/api/applicants', (req, res) => {
-  const { control_number, first_name, last_name, city, is_blacklisted } = req.body;
-  
-  // Validation - Check required fields
-  if (!control_number || !first_name || !last_name || !city) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-  
-  // Validate control number
-  const controlNumValidation = validateControlNumber(control_number);
-  if (!controlNumValidation.valid) {
-    return res.status(400).json({ error: controlNumValidation.error });
-  }
-  
-  // Validate first name
-  const firstNameValidation = validateName(first_name, 'First name');
-  if (!firstNameValidation.valid) {
-    return res.status(400).json({ error: firstNameValidation.error });
-  }
-  
-  // Validate last name
-  const lastNameValidation = validateName(last_name, 'Last name');
-  if (!lastNameValidation.valid) {
-    return res.status(400).json({ error: lastNameValidation.error });
-  }
-  
-  // Validate city
-  if (!NIR_LOCATIONS.includes(city)) {
-    return res.status(400).json({ error: 'City must be a valid location in Negros Island Region' });
-  }
-  
-  const query = `
-    INSERT INTO applicants (control_number, first_name, last_name, city, is_blacklisted, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-  `;
-  
-  const params = [
-    controlNumValidation.value,
-    firstNameValidation.value,
-    lastNameValidation.value,
-    sanitizeInput(city),
-    is_blacklisted ? 1 : 0
-  ];
-  
-  db.run(query, params, function(err) {
-    if (err) {
-      if (err.message.includes('UNIQUE constraint failed')) {
-        return res.status(409).json({ error: 'Control number already exists' });
-      }
-      return res.status(500).json({ error: err.message });
-    }
-    res.status(201).json({
-      id: this.lastID,
-      control_number: controlNumValidation.value,
-      first_name: firstNameValidation.value,
-      last_name: lastNameValidation.value,
-      city: sanitizeInput(city),
-      is_blacklisted: is_blacklisted || false
-    });
-  });
-});
-
-// PUT update applicant (with blacklist protection)
-app.put('/api/applicants/:id', (req, res) => {
-  const { id } = req.params;
-  const { control_number, first_name, last_name, city, is_blacklisted } = req.body;
-  
-  // First, check if applicant exists and is blacklisted
-  db.get('SELECT * FROM applicants WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (!row) {
-      return res.status(404).json({ error: 'Applicant not found' });
-    }
-    
-    // THE LOCK GUARD: Block control_number change if blacklisted
-    if (row.is_blacklisted === 1 && control_number && control_number !== row.control_number) {
-      return res.status(403).json({ 
-        error: 'Cannot modify control number of a blacklisted account',
-        blacklisted: true
-      });
-    }
-    
-    // Input validation
-    if (control_number !== undefined) {
-      const validation = validateControlNumber(control_number);
-      if (!validation.valid) {
-        return res.status(400).json({ error: validation.error });
-      }
-    }
-    
-    if (first_name !== undefined) {
-      const validation = validateName(first_name, 'First name');
-      if (!validation.valid) {
-        return res.status(400).json({ error: validation.error });
-      }
-    }
-    
-    if (last_name !== undefined) {
-      const validation = validateName(last_name, 'Last name');
-      if (!validation.valid) {
-        return res.status(400).json({ error: validation.error });
-      }
-    }
-    
-    if (city && !NIR_LOCATIONS.includes(city)) {
-      return res.status(400).json({ error: 'City must be a valid location in Negros Island Region' });
-    }
-    
-    // Build update query dynamically with validated values
-    const updates = [];
-    const params = [];
-    
-    if (control_number !== undefined) {
-      const validation = validateControlNumber(control_number);
-      updates.push('control_number = ?');
-      params.push(validation.value);
-    }
-    if (first_name !== undefined) {
-      const validation = validateName(first_name, 'First name');
-      updates.push('first_name = ?');
-      params.push(validation.value);
-    }
-    if (last_name !== undefined) {
-      const validation = validateName(last_name, 'Last name');
-      updates.push('last_name = ?');
-      params.push(validation.value);
-    }
-    if (city !== undefined) {
-      updates.push('city = ?');
-      params.push(sanitizeInput(city));
-    }
-    if (is_blacklisted !== undefined) {
-      updates.push('is_blacklisted = ?');
-      params.push(is_blacklisted ? 1 : 0);
-    }
-    
-    if (updates.length === 0) {
-      return res.status(400).json({ error: 'No fields to update' });
-    }
-    
-    params.push(id);
-    const query = `UPDATE applicants SET ${updates.join(', ')} WHERE id = ?`;
-    
-    db.run(query, params, function(err) {
-      if (err) {
-        if (err.message.includes('UNIQUE constraint failed')) {
-          return res.status(409).json({ error: 'Control number already exists' });
+    if (row.count === 0) {
+      console.log('Seeding database with sample HOA data...');
+      const sampleHoas = [
+        {
+          cert_of_inc_no: 'HOA-2024-001',
+          hoa_name: 'Sunset Valley HOA',
+          reg_type: 'Residential',
+          issuance_date: '2024-01-15',
+          classification: 'Class A',
+          barangay: 'District 1',
+          city_municipality: 'Bacolod City',
+          province: 'Negros Occidental',
+          contact_person: 'John Martinez',
+          contact_details: 'john.m@sunsetvalley.org',
+          total_members: 150,
+          date_of_election: '2024-01-10',
+          term_of_office: '2024-2027',
+          status_findings: 'In Good Standing',
+          evaluator_name: 'Maria Elena Santos'
+        },
+        {
+          cert_of_inc_no: 'HOA-2024-002',
+          hoa_name: 'Green Meadows Association',
+          reg_type: 'Residential',
+          issuance_date: '2024-02-20',
+          classification: 'Class A',
+          barangay: 'District 2',
+          city_municipality: 'Dumaguete City',
+          province: 'Negros Oriental',
+          contact_person: 'Maria Santos',
+          contact_details: 'maria.s@greenmeadows.org',
+          total_members: 220,
+          date_of_election: '2024-02-15',
+          term_of_office: '2024-2027',
+          status_findings: 'In Good Standing',
+          evaluator_name: 'Roberto M. Cruz'
+        },
+        {
+          cert_of_inc_no: 'HOA-2023-889',
+          hoa_name: 'Lakeside Residents HOA',
+          reg_type: 'Residential',
+          issuance_date: '2023-11-10',
+          classification: 'Class B',
+          barangay: 'District 1',
+          city_municipality: 'Silay City',
+          province: 'Negros Occidental',
+          contact_person: 'Robert Chen',
+          contact_details: 'robert.c@lakeside.org',
+          total_members: 95,
+          date_of_election: '2023-11-08',
+          term_of_office: '2023-2026',
+          status_findings: 'Under Review',
+          evaluator_name: 'Ana Marie Reyes'
+        },
+        {
+          cert_of_inc_no: 'HOA-2024-003',
+          hoa_name: 'Palm Heights Community',
+          reg_type: 'Residential',
+          issuance_date: '2024-03-05',
+          classification: 'Class A',
+          barangay: 'District 3',
+          city_municipality: 'Bago City',
+          province: 'Negros Occidental',
+          contact_person: 'Sarah Johnson',
+          contact_details: 'sarah.j@palmheights.org',
+          total_members: 310,
+          date_of_election: '2024-03-01',
+          term_of_office: '2024-2027',
+          status_findings: 'In Good Standing',
+          evaluator_name: 'Jose P. Hernandez'
+        },
+        {
+          cert_of_inc_no: 'HOA-2023-067',
+          hoa_name: 'River Park Homeowners',
+          reg_type: 'Residential',
+          issuance_date: '2023-09-12',
+          classification: 'Class A',
+          barangay: 'District 2',
+          city_municipality: 'Himamaylan City',
+          province: 'Negros Occidental',
+          contact_person: 'Michael Davis',
+          contact_details: 'michael.d@riverpark.org',
+          total_members: 180,
+          date_of_election: '2023-09-10',
+          term_of_office: '2023-2026',
+          status_findings: 'Sanctioned',
+          evaluator_name: 'Roberto M. Cruz'
         }
-        return res.status(500).json({ error: err.message });
-      }
-      
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Applicant not found' });
-      }
-      
-      // Fetch updated record
-      db.get('SELECT * FROM applicants WHERE id = ?', [id], (err, updatedRow) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        updatedRow.is_blacklisted = updatedRow.is_blacklisted === 1;
-        res.json(updatedRow);
-      });
-    });
-  });
-});
+      ];
 
-// DELETE applicant (soft delete - archive)
-app.delete('/api/applicants/:id', (req, res) => {
-  const query = `UPDATE applicants SET is_archived = 1, archived_at = datetime('now') WHERE id = ? AND is_archived = 0`;
-  
-  db.run(query, [req.params.id], function(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Applicant not found or already archived' });
-    }
-    res.json({ message: 'Applicant archived successfully' });
-  });
-});
-
-// Restore archived applicant
-app.put('/api/archived/:id/restore', (req, res) => {
-  const query = 'UPDATE applicants SET is_archived = 0, archived_at = NULL WHERE id = ? AND is_archived = 1';
-  
-  db.run(query, [req.params.id], function(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Archived applicant not found' });
-    }
-    res.json({ message: 'Applicant restored successfully' });
-  });
-});
-
-// Permanently delete archived applicant
-app.delete('/api/archived/:id', (req, res) => {
-  const query = 'DELETE FROM applicants WHERE id = ? AND is_archived = 1';
-  
-  db.run(query, [req.params.id], function(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Archived applicant not found' });
-    }
-    res.json({ message: 'Applicant permanently deleted' });
-  });
-});
-
-// GET blacklisted applicants only (excluding archived)
-app.get('/api/blacklist', (req, res) => {
-  const query = 'SELECT * FROM applicants WHERE is_blacklisted = 1 AND is_archived = 0 ORDER BY id DESC';
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    const applicants = rows.map(row => ({
-      ...row,
-      is_blacklisted: true
-    }));
-    res.json(applicants);
-  });
-});
-
-// GET statistics for dashboard
-// GET dashboard stats
-app.get('/api/stats', (req, res) => {
-  // First check if is_archived column exists
-  db.get("PRAGMA table_info(applicants)", [], (err, result) => {
-    // Check if table has is_archived column
-    db.all("PRAGMA table_info(applicants)", [], (err, columns) => {
-      const hasArchivedColumn = columns && columns.some(col => col.name === 'is_archived');
-      
-      const queries = hasArchivedColumn ? {
-        total: 'SELECT COUNT(*) as count FROM applicants WHERE is_archived = 0',
-        blacklisted: 'SELECT COUNT(*) as count FROM applicants WHERE is_blacklisted = 1 AND is_archived = 0',
-        active: 'SELECT COUNT(*) as count FROM applicants WHERE is_blacklisted = 0 AND is_archived = 0',
-        archived: 'SELECT COUNT(*) as count FROM applicants WHERE is_archived = 1'
-      } : {
-        total: 'SELECT COUNT(*) as count FROM applicants',
-        blacklisted: 'SELECT COUNT(*) as count FROM applicants WHERE is_blacklisted = 1',
-        active: 'SELECT COUNT(*) as count FROM applicants WHERE is_blacklisted = 0',
-        archived: 'SELECT 0 as count'
-      };
-      
-      const stats = {};
-      let completed = 0;
-      const totalQueries = Object.keys(queries).length + 1; // +1 for city breakdown
-      
-      // Get basic stats
-      Object.keys(queries).forEach(key => {
-        if (queries[key] === 'SELECT 0 as count') {
-          stats[key] = 0;
-          completed++;
-          if (completed === totalQueries) {
-            res.json(stats);
+      sampleHoas.forEach(hoa => {
+        db.run(
+          `INSERT INTO hoas VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+          [
+            hoa.cert_of_inc_no,
+            hoa.hoa_name,
+            hoa.reg_type,
+            hoa.issuance_date,
+            hoa.classification,
+            hoa.barangay,
+            hoa.city_municipality,
+            hoa.province,
+            hoa.contact_person,
+            hoa.contact_details,
+            hoa.total_members,
+            hoa.date_of_election,
+            hoa.term_of_office,
+            hoa.status_findings,
+            hoa.evaluator_name
+          ],
+          (err) => {
+            if (err && !err.message.includes('UNIQUE constraint')) {
+              console.error('Error seeding HOA:', err);
+            }
           }
-        } else {
-          db.get(queries[key], [], (err, row) => {
-            if (err) {
-              console.error(`Error fetching ${key} stat:`, err.message);
-              stats[key] = 0;
-            } else {
-              stats[key] = row.count;
-            }
-            
-            completed++;
-            if (completed === totalQueries) {
-              res.json(stats);
-            }
-          });
-        }
+        );
       });
-      
-      // Get city breakdown (excluding archived if column exists)
-      const cityQuery = hasArchivedColumn 
-        ? 'SELECT city, COUNT(*) as count FROM applicants WHERE is_archived = 0 GROUP BY city ORDER BY count DESC'
-        : 'SELECT city, COUNT(*) as count FROM applicants GROUP BY city ORDER BY count DESC';
-        
-      db.all(cityQuery, [], (err, rows) => {
-        if (err) {
-          console.error('Error fetching city breakdown:', err.message);
-          stats.cityBreakdown = [];
-        } else {
-          stats.cityBreakdown = rows;
-        }
-        
-        completed++;
-        if (completed === totalQueries) {
-          res.json(stats);
-        }
-      });
-    });
-  });
-});
 
-// GET NIR locations
-app.get('/api/locations', (req, res) => {
-  res.json(NIR_LOCATIONS);
-});
+      // Seed sample legal orders
+      const sampleOrders = [
+        {
+          cert_of_inc_no: 'HOA-2023-067',
+          type: 'OIAS',
+          control_number: 'OIAS-2026-001',
+          date_issued: '2026-02-05',
+          violation_type: 'Administrative Fine',
+          violation_description: 'Multiple violations of reporting requirements and governance standards',
+          evaluator: 'Roberto M. Cruz',
+          sanction_amount: 50000.00,
+          effective_date: '2026-01-15',
+          appeal_deadline: '2026-03-05'
+        },
+        {
+          cert_of_inc_no: 'HOA-2024-001',
+          type: 'NOV',
+          control_number: 'NOV-2026-001',
+          date_issued: '2026-02-10',
+          violation_type: 'Failure to Submit Annual Reports',
+          violation_description: 'HOA failed to submit required annual financial reports for fiscal year 2025',
+          evaluator: 'Maria Elena Santos',
+          status: 'Active'
+        }
+      ];
 
-// CSV Export - Download all applicants as CSV
-app.get('/api/export/csv', (req, res) => {
-  const query = 'SELECT id, control_number, first_name, last_name, city, is_blacklisted, is_archived, archived_at FROM applicants ORDER BY id DESC';
-  
-  db.all(query, [], async (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    
-    try {
-      const csvFilePath = path.join(__dirname, 'exports', 'applicants.csv');
-      
-      // Ensure exports directory exists
-      if (!fs.existsSync(path.join(__dirname, 'exports'))) {
-        fs.mkdirSync(path.join(__dirname, 'exports'));
-      }
-      
-      const csvWriter = createObjectCsvWriter({
-        path: csvFilePath,
-        header: [
-          { id: 'id', title: 'ID' },
-          { id: 'control_number', title: 'Control Number' },
-          { id: 'first_name', title: 'First Name' },
-          { id: 'last_name', title: 'Last Name' },
-          { id: 'city', title: 'City' },
-          { id: 'is_blacklisted', title: 'Blacklisted' },
-          { id: 'is_archived', title: 'Archived' },
-          { id: 'archived_at', title: 'Archived Date' }
-        ]
-      });
-      
-      await csvWriter.writeRecords(rows);
-      
-      res.download(csvFilePath, `DHSUD_Applicants_${new Date().toISOString().split('T')[0]}.csv`, (err) => {
-        if (err) {
-          console.error('Error downloading file:', err);
-        }
-        // Clean up file after download
-        fs.unlinkSync(csvFilePath);
-      });
-    } catch (error) {
-      console.error('Error creating CSV:', error);
-      res.status(500).json({ error: 'Failed to generate CSV file' });
-    }
-  });
-});
-
-// CSV Import - Upload and import applicants from CSV
-app.post('/api/import/csv', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
-  
-  const results = [];
-  const errors = [];
-  let processedCount = 0;
-  let successCount = 0;
-  let errorCount = 0;
-  
-  fs.createReadStream(req.file.path)
-    .pipe(csv())
-    .on('data', (data) => results.push(data))
-    .on('end', () => {
-      // Process each row
-      results.forEach((row, index) => {
-        const controlNumber = row['Control Number'] || row['control_number'];
-        const firstName = row['First Name'] || row['first_name'];
-        const lastName = row['Last Name'] || row['last_name'];
-        const city = row['City'] || row['city'];
-        const isBlacklisted = row['Blacklisted'] || row['is_blacklisted'] || 0;
-        
-        // Validate required fields
-        if (!controlNumber || !firstName || !lastName || !city) {
-          errors.push({ row: index + 2, error: 'Missing required fields' });
-          errorCount++;
-          processedCount++;
-          checkCompletion();
-          return;
-        }
-        
-        // Validate control number
-        const controlNumValidation = validateControlNumber(controlNumber);
-        if (!controlNumValidation.valid) {
-          errors.push({ row: index + 2, field: 'Control Number', error: controlNumValidation.error });
-          errorCount++;
-          processedCount++;
-          checkCompletion();
-          return;
-        }
-        
-        // Validate first name
-        const firstNameValidation = validateName(firstName, 'First name');
-        if (!firstNameValidation.valid) {
-          errors.push({ row: index + 2, field: 'First Name', error: firstNameValidation.error });
-          errorCount++;
-          processedCount++;
-          checkCompletion();
-          return;
-        }
-        
-        // Validate last name
-        const lastNameValidation = validateName(lastName, 'Last name');
-        if (!lastNameValidation.valid) {
-          errors.push({ row: index + 2, field: 'Last Name', error: lastNameValidation.error });
-          errorCount++;
-          processedCount++;
-          checkCompletion();
-          return;
-        }
-        
-        // Validate city
-        if (!NIR_LOCATIONS.includes(city)) {
-          errors.push({ row: index + 2, field: 'City', error: 'Invalid city/municipality' });
-          errorCount++;
-          processedCount++;
-          checkCompletion();
-          return;
-        }
-        
-        // Insert into database
-        const query = `INSERT INTO applicants (control_number, first_name, last_name, city, is_blacklisted, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
-        const params = [
-          controlNumValidation.value,
-          firstNameValidation.value,
-          lastNameValidation.value,
-          sanitizeInput(city),
-          isBlacklisted === '1' || isBlacklisted === 1 || isBlacklisted === 'true' ? 1 : 0
-        ];
-        
-        db.run(query, params, function(err) {
-          if (err) {
-            if (err.message.includes('UNIQUE constraint failed')) {
-              errors.push({ row: index + 2, error: 'Control number already exists' });
-            } else {
-              errors.push({ row: index + 2, error: err.message });
+      sampleOrders.forEach(order => {
+        db.run(
+          `INSERT INTO legal_orders (cert_of_inc_no, type, control_number, date_issued, violation_type, violation_description, evaluator, status, sanction_amount, effective_date, appeal_deadline, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          [
+            order.cert_of_inc_no,
+            order.type,
+            order.control_number,
+            order.date_issued,
+            order.violation_type,
+            order.violation_description,
+            order.evaluator,
+            order.status || 'Active',
+            order.sanction_amount || null,
+            order.effective_date || null,
+            order.appeal_deadline || null
+          ],
+          (err) => {
+            if (err && !err.message.includes('UNIQUE constraint')) {
+              console.error('Error seeding legal order:', err);
             }
-            errorCount++;
-          } else {
-            successCount++;
           }
-          processedCount++;
-          checkCompletion();
-        });
+        );
       });
-      
-      function checkCompletion() {
-        if (processedCount === results.length) {
-          // Clean up uploaded file
-          fs.unlinkSync(req.file.path);
-          
-          res.json({
-            success: true,
-            message: `Import completed: ${successCount} successful, ${errorCount} failed`,
-            total: results.length,
-            successful: successCount,
-            failed: errorCount,
-            errors: errors
-          });
-        }
-      }
-      
-      // If no data in CSV
-      if (results.length === 0) {
-        fs.unlinkSync(req.file.path);
-        return res.status(400).json({ error: 'CSV file is empty or invalid' });
-      }
-    })
-    .on('error', (error) => {
-      console.error('Error parsing CSV:', error);
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      res.status(500).json({ error: 'Failed to parse CSV file' });
-    });
-});
 
-// ================== STATUS MANAGEMENT ==================
-// Update applicant status
-app.put('/api/applicants/:id/status', (req, res) => {
-  const { status } = req.body;
-  const validStatuses = ['Pending', 'Under Review', 'Approved', 'Rejected', 'On Hold'];
-  
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Invalid status' });
-  }
-  
-  db.run(
-    'UPDATE applicants SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [status, req.params.id],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json({ success: true, message: 'Status updated' });
+      console.log('✓ Database seeded successfully');
+    } else {
+      console.log('✓ Database already seeded');
     }
-  );
-});
+  });
+}
 
-// ================== FILTERING & SORTING ==================
-// Get filtered and sorted applicants
-app.get('/api/applicants/filter', (req, res) => {
-  const { city, status, blacklisted, archived, sortBy = 'id', sortOrder = 'ASC', limit = 100, offset = 0 } = req.query;
-  
-  let where = ['is_archived = 0'];
-  let params = [];
-  
-  if (city && city !== 'all') {
-    where.push('city = ?');
-    params.push(city);
+// ==================== HOA ROUTES ====================
+
+// GET all HOAs with filters
+app.get('/api/hoas', (req, res) => {
+  const { search, status, city } = req.query;
+
+  let query = 'SELECT * FROM hoas WHERE 1=1';
+  const params = [];
+
+  if (search) {
+    query += ` AND (hoa_name LIKE ? OR cert_of_inc_no LIKE ? OR contact_person LIKE ?)`;
+    const searchTerm = `%${search}%`;
+    params.push(searchTerm, searchTerm, searchTerm);
   }
-  
-  if (status && status !== 'all') {
-    where.push('status = ?');
+
+  if (status) {
+    query += ` AND status_findings = ?`;
     params.push(status);
   }
-  
-  if (blacklisted === 'true') {
-    where.push('is_blacklisted = 1');
+
+  if (city) {
+    query += ` AND city_municipality = ?`;
+    params.push(city);
   }
-  
-  if (archived === 'true') {
-    where = ['is_archived = 1'];
-  }
-  
-  const validSortColumns = ['control_number', 'first_name', 'last_name', 'city', 'status', 'created_at'];
-  const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'id';
-  const order = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-  
-  const query = `SELECT * FROM applicants WHERE ${where.join(' AND ')} ORDER BY ${sortColumn} ${order} LIMIT ? OFFSET ?`;
-  params.push(parseInt(limit), parseInt(offset));
-  
+
+  query += ` ORDER BY date_last_update DESC`;
+
   db.all(query, params, (err, rows) => {
     if (err) {
-      return res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message });
+      return;
     }
-    res.json(rows);
+
+    // Enrich each HOA with legal order information
+    Promise.all((rows || []).map(hoa => {
+      return new Promise((resolve) => {
+        db.all(
+          'SELECT id, type, control_number, date_issued, status FROM legal_orders WHERE cert_of_inc_no = ? ORDER BY date_issued DESC',
+          [hoa.cert_of_inc_no],
+          (err, orders) => {
+            resolve({
+              ...hoa,
+              legal_orders: orders || [],
+              has_oias: orders && orders.some(o => o.type === 'OIAS'),
+              is_sanctioned: orders && orders.some(o => o.type === 'OIAS')
+            });
+          }
+        );
+      });
+    })).then(enriched => {
+      res.json(enriched);
+    });
   });
 });
 
-// ================== BULK OPERATIONS ==================
-// Bulk update status
-app.post('/api/applicants/bulk/status', (req, res) => {
-  const { ids, status } = req.body;
-  const validStatuses = ['Pending', 'Under Review', 'Approved', 'Rejected', 'On Hold'];
-  
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: 'No IDs provided' });
-  }
+// GET single HOA detail
+app.get('/api/hoas/:cert_of_inc_no', (req, res) => {
+  const { cert_of_inc_no } = req.params;
 
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Invalid status' });
-  }
-  
-  const placeholders = ids.map(() => '?').join(',');
-  const query = `UPDATE applicants SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id IN (${placeholders})`;
-  
-  db.run(query, [status, ...ids], function(err) {
+  db.get('SELECT * FROM hoas WHERE cert_of_inc_no = ?', [cert_of_inc_no], (err, hoa) => {
     if (err) {
-      return res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message });
+      return;
     }
-    res.json({ success: true, message: `Updated ${this.changes} records` });
+
+    if (!hoa) {
+      res.status(404).json({ error: 'HOA not found' });
+      return;
+    }
+
+    // Get legal orders
+    db.all(
+      'SELECT * FROM legal_orders WHERE cert_of_inc_no = ? ORDER BY date_issued DESC',
+      [cert_of_inc_no],
+      (err, orders) => {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+
+        res.json({
+          ...hoa,
+          legal_orders: orders || [],
+          has_oias: orders && orders.some(o => o.type === 'OIAS'),
+          is_sanctioned: orders && orders.some(o => o.type === 'OIAS')
+        });
+      }
+    );
   });
 });
 
-// Bulk delete (move to archive)
-app.post('/api/applicants/bulk/archive', (req, res) => {
-  const { ids } = req.body;
-  
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: 'No IDs provided' });
+// CREATE new HOA
+app.post('/api/hoas', (req, res) => {
+  const {
+    cert_of_inc_no,
+    hoa_name,
+    reg_type,
+    issuance_date,
+    classification,
+    barangay,
+    city_municipality,
+    province,
+    contact_person,
+    contact_details,
+    total_members,
+    date_of_election,
+    term_of_office,
+    status_findings,
+    evaluator_name
+  } = req.body;
+
+  if (!cert_of_inc_no || !hoa_name) {
+    res.status(400).json({ error: 'cert_of_inc_no and hoa_name are required' });
+    return;
   }
-  
-  const placeholders = ids.map(() => '?').join(',');
-  const query = `UPDATE applicants SET is_archived = 1, archived_at = CURRENT_TIMESTAMP WHERE id IN (${placeholders})`;
-  
-  db.run(query, ids, function(err) {
+
+  db.run(
+    `INSERT INTO hoas VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    [
+      cert_of_inc_no,
+      hoa_name,
+      reg_type,
+      issuance_date,
+      classification,
+      barangay,
+      city_municipality,
+      province,
+      contact_person,
+      contact_details,
+      total_members,
+      date_of_election,
+      term_of_office,
+      status_findings || 'In Good Standing',
+      evaluator_name
+    ],
+    function(err) {
+      if (err) {
+        if (err.message.includes('UNIQUE')) {
+          res.status(409).json({ error: 'HOA already exists' });
+        } else {
+          res.status(500).json({ error: err.message });
+        }
+        return;
+      }
+      res.status(201).json({ message: 'HOA created', cert_of_inc_no });
+    }
+  );
+});
+
+// UPDATE HOA (except cert_of_inc_no if sanctioned)
+app.put('/api/hoas/:cert_of_inc_no', (req, res) => {
+  const { cert_of_inc_no } = req.params;
+  const updates = req.body;
+
+  // Check if HOA is sanctioned
+  db.get(
+    'SELECT legal_orders.id FROM legal_orders WHERE cert_of_inc_no = ? AND type = ?',
+    [cert_of_inc_no, 'OIAS'],
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      // If sanctioned, don't allow cert_of_inc_no changes
+      if (row && updates.cert_of_inc_no) {
+        res.status(403).json({ error: 'Cannot modify cert_of_inc_no for sanctioned HOA' });
+        return;
+      }
+
+      const validFields = [
+        'hoa_name', 'reg_type', 'issuance_date', 'classification',
+        'barangay', 'city_municipality', 'province', 'contact_person',
+        'contact_details', 'total_members', 'date_of_election', 'term_of_office',
+        'status_findings', 'evaluator_name'
+      ];
+
+      const setClause = [];
+      const values = [];
+
+      for (const field of validFields) {
+        if (field in updates) {
+          setClause.push(`${field} = ?`);
+          values.push(updates[field]);
+        }
+      }
+
+      if (setClause.length === 0) {
+        res.status(400).json({ error: 'No valid fields provided' });
+        return;
+      }
+
+      setClause.push(`date_last_update = CURRENT_TIMESTAMP`);
+      values.push(cert_of_inc_no);
+
+      db.run(
+        `UPDATE hoas SET ${setClause.join(', ')} WHERE cert_of_inc_no = ?`,
+        values,
+        (err) => {
+          if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+          }
+          res.json({ message: 'HOA updated' });
+        }
+      );
+    }
+  );
+});
+
+// DELETE HOA
+app.delete('/api/hoas/:cert_of_inc_no', (req, res) => {
+  const { cert_of_inc_no } = req.params;
+
+  db.serialize(() => {
+    // Delete related appeals first
+    db.run(
+      'DELETE FROM appeals WHERE order_id IN (SELECT id FROM legal_orders WHERE cert_of_inc_no = ?)',
+      [cert_of_inc_no]
+    );
+    
+    // Delete related orders
+    db.run('DELETE FROM legal_orders WHERE cert_of_inc_no = ?', [cert_of_inc_no]);
+    
+    // Delete HOA
+    db.run(
+      'DELETE FROM hoas WHERE cert_of_inc_no = ?',
+      [cert_of_inc_no],
+      (err) => {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        res.json({ message: 'HOA deleted' });
+      }
+    );
+  });
+});
+
+// ==================== LEGAL ORDERS ROUTES ====================
+
+// GET all legal orders
+app.get('/api/legal-orders', (req, res) => {
+  const { type, status, search } = req.query;
+
+  let query = 'SELECT * FROM legal_orders WHERE 1=1';
+  const params = [];
+
+  if (type) {
+    query += ` AND type = ?`;
+    params.push(type);
+  }
+
+  if (status) {
+    query += ` AND status = ?`;
+    params.push(status);
+  }
+
+  if (search) {
+    query += ` AND (control_number LIKE ? OR cert_of_inc_no LIKE ?)`;
+    const searchTerm = `%${search}%`;
+    params.push(searchTerm, searchTerm);
+  }
+
+  query += ` ORDER BY date_issued DESC`;
+
+  db.all(query, params, (err, rows) => {
     if (err) {
-      return res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message });
+      return;
     }
-    res.json({ success: true, message: `Archived ${this.changes} records` });
+    res.json(rows || []);
   });
 });
 
-// ================== ACTIVITY LOG ==================
-// Log activity
-function logActivity(userId, applicantId, action, details) {
-  db.run(
-    'INSERT INTO activity_log (user_id, applicant_id, action, details) VALUES (?, ?, ?, ?)',
-    [userId || null, applicantId || null, action, details || null]
-  );
-}
+// GET single legal order with HOA details
+app.get('/api/legal-orders/:id', (req, res) => {
+  const { id } = req.params;
 
-// Get activity log for applicant
-app.get('/api/applicants/:id/activity', (req, res) => {
-  db.all(
-    `SELECT al.*, u.username FROM activity_log al 
-     LEFT JOIN users u ON al.user_id = u.id 
-     WHERE al.applicant_id = ? 
-     ORDER BY al.created_at DESC`,
-    [req.params.id],
-    (err, rows) => {
+  db.get(
+    `SELECT lo.*, h.hoa_name, h.contact_person 
+     FROM legal_orders lo
+     JOIN hoas h ON lo.cert_of_inc_no = h.cert_of_inc_no
+     WHERE lo.id = ?`,
+    [id],
+    (err, row) => {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
+        return;
       }
-      res.json(rows);
+
+      if (!row) {
+        res.status(404).json({ error: 'Legal order not found' });
+        return;
+      }
+
+      res.json(row);
     }
   );
 });
 
-// Get all activity log
-app.get('/api/activity-log', (req, res) => {
-  const { limit = 100, offset = 0 } = req.query;
-  
-  db.all(
-    `SELECT al.*, u.username, a.control_number FROM activity_log al 
-     LEFT JOIN users u ON al.user_id = u.id 
-     LEFT JOIN applicants a ON al.applicant_id = a.id 
-     ORDER BY al.created_at DESC 
-     LIMIT ? OFFSET ?`,
-    [parseInt(limit), parseInt(offset)],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows);
-    }
-  );
-});
+// CREATE legal order (NOV, OTP, OIAS)
+app.post('/api/legal-orders', (req, res) => {
+  const {
+    cert_of_inc_no,
+    type,
+    control_number,
+    date_issued,
+    violation_type,
+    violation_description,
+    evaluator,
+    sanction_amount,
+    effective_date,
+    appeal_deadline
+  } = req.body;
 
-// ================== COMMENTS & NOTES ==================
-// Add comment
-app.post('/api/applicants/:id/comments', (req, res) => {
-  const { comment, userId } = req.body;
-  
-  if (!comment) {
-    return res.status(400).json({ error: 'Comment is required' });
+  if (!cert_of_inc_no || !type || !control_number) {
+    res.status(400).json({ error: 'cert_of_inc_no, type, and control_number are required' });
+    return;
   }
-  
+
+  if (!['NOV', 'OTP', 'OIAS'].includes(type)) {
+    res.status(400).json({ error: 'type must be NOV, OTP, or OIAS' });
+    return;
+  }
+
   db.run(
-    'INSERT INTO comments (user_id, applicant_id, comment) VALUES (?, ?, ?)',
-    [userId || null, req.params.id, comment],
+    `INSERT INTO legal_orders (cert_of_inc_no, type, control_number, date_issued, violation_type, violation_description, evaluator, sanction_amount, effective_date, appeal_deadline, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+    [
+      cert_of_inc_no,
+      type,
+      control_number,
+      date_issued,
+      violation_type,
+      violation_description,
+      evaluator,
+      sanction_amount || null,
+      effective_date || null,
+      appeal_deadline || null
+    ],
     function(err) {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        if (err.message.includes('UNIQUE')) {
+          res.status(409).json({ error: 'Control number already exists' });
+        } else {
+          res.status(500).json({ error: err.message });
+        }
+        return;
       }
-      res.json({ id: this.lastID, success: true });
+
+      // If creating an OIAS, update HOA status
+      if (type === 'OIAS') {
+        db.run(
+          'UPDATE hoas SET status_findings = ? WHERE cert_of_inc_no = ?',
+          ['Sanctioned', cert_of_inc_no]
+        );
+      }
+
+      res.status(201).json({ message: 'Legal order created', id: this.lastID });
     }
   );
 });
 
-// Get comments for applicant
-app.get('/api/applicants/:id/comments', (req, res) => {
-  db.all(
-    `SELECT c.*, u.username FROM comments c 
-     LEFT JOIN users u ON c.user_id = u.id 
-     WHERE c.applicant_id = ? 
-     ORDER BY c.created_at DESC`,
-    [req.params.id],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows);
-    }
-  );
-});
+// UPDATE legal order
+app.put('/api/legal-orders/:id', (req, res) => {
+  const { id } = req.params;
+  const { status, violation_description, sanction_amount } = req.body;
 
-// Delete comment
-app.delete('/api/comments/:commentId', (req, res) => {
+  const updates = [];
+  const values = [];
+
+  if (status !== undefined) {
+    updates.push('status = ?');
+    values.push(status);
+  }
+
+  if (violation_description !== undefined) {
+    updates.push('violation_description = ?');
+    values.push(violation_description);
+  }
+
+  if (sanction_amount !== undefined) {
+    updates.push('sanction_amount = ?');
+    values.push(sanction_amount);
+  }
+
+  if (updates.length === 0) {
+    res.status(400).json({ error: 'No fields to update' });
+    return;
+  }
+
+  values.push(id);
+
   db.run(
-    'DELETE FROM comments WHERE id = ?',
-    [req.params.commentId],
+    `UPDATE legal_orders SET ${updates.join(', ')} WHERE id = ?`,
+    values,
+    (err) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ message: 'Legal order updated' });
+    }
+  );
+});
+
+// DELETE legal order
+app.delete('/api/legal-orders/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.serialize(() => {
+    // Delete related appeals
+    db.run('DELETE FROM appeals WHERE order_id = ?', [id]);
+    
+    // Delete order
+    db.run(
+      'DELETE FROM legal_orders WHERE id = ?',
+      [id],
+      (err) => {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        res.json({ message: 'Legal order deleted' });
+      }
+    );
+  });
+});
+
+// ==================== APPEALS ROUTES ====================
+
+// GET all appeals
+app.get('/api/appeals', (req, res) => {
+  const { status, search } = req.query;
+
+  let query = `SELECT a.*, lo.control_number as order_control, lo.type as order_type, h.hoa_name
+               FROM appeals a
+               JOIN legal_orders lo ON a.order_id = lo.id
+               JOIN hoas h ON lo.cert_of_inc_no = h.cert_of_inc_no
+               WHERE 1=1`;
+  const params = [];
+
+  if (status) {
+    query += ` AND a.status = ?`;
+    params.push(status);
+  }
+
+  if (search) {
+    query += ` AND (a.appeal_control_number LIKE ? OR h.hoa_name LIKE ?)`;
+    const searchTerm = `%${search}%`;
+    params.push(searchTerm, searchTerm);
+  }
+
+  query += ` ORDER BY a.filing_date DESC`;
+
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows || []);
+  });
+});
+
+// GET single appeal
+app.get('/api/appeals/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get(
+    `SELECT a.*, lo.control_number as order_control, lo.type as order_type, lo.violation_description, h.hoa_name, h.contact_person
+     FROM appeals a
+     JOIN legal_orders lo ON a.order_id = lo.id
+     JOIN hoas h ON lo.cert_of_inc_no = h.cert_of_inc_no
+     WHERE a.id = ?`,
+    [id],
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      if (!row) {
+        res.status(404).json({ error: 'Appeal not found' });
+        return;
+      }
+
+      res.json(row);
+    }
+  );
+});
+
+// CREATE appeal (Motion for Reconsideration)
+app.post('/api/appeals', (req, res) => {
+  const {
+    order_id,
+    appeal_control_number,
+    date_filed,
+    grounds_for_appeal,
+    filing_date,
+    hearing_date
+  } = req.body;
+
+  if (!order_id || !appeal_control_number) {
+    res.status(400).json({ error: 'order_id and appeal_control_number are required' });
+    return;
+  }
+
+  db.run(
+    `INSERT INTO appeals (order_id, type, appeal_control_number, date_filed, grounds_for_appeal, filing_date, hearing_date, created_at)
+     VALUES (?, 'MR', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+    [
+      order_id,
+      appeal_control_number,
+      date_filed,
+      grounds_for_appeal,
+      filing_date,
+      hearing_date
+    ],
     function(err) {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        if (err.message.includes('UNIQUE')) {
+          res.status(409).json({ error: 'Appeal control number already exists' });
+        } else {
+          res.status(500).json({ error: err.message });
+        }
+        return;
       }
-      res.json({ success: true });
+      res.status(201).json({ message: 'Appeal filed', id: this.lastID });
     }
   );
 });
 
-// ================== DUPLICATE DETECTION ==================
-// Check for duplicates on import
-app.post('/api/check-duplicates', (req, res) => {
-  const { firstName, lastName, controlNumber } = req.body;
-  
-  db.all(
-    `SELECT id, control_number, first_name, last_name FROM applicants 
-     WHERE (control_number = ? OR (first_name = ? AND last_name = ?)) 
-     AND is_archived = 0`,
-    [controlNumber, firstName, lastName],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json({ duplicates: rows });
-    }
-  );
-});
+// UPDATE appeal
+app.put('/api/appeals/:id', (req, res) => {
+  const { id } = req.params;
+  const { status, grounds_for_appeal, hearing_date } = req.body;
 
-// ================== ARCHIVE MANAGEMENT ==================
-// Restore from archive
-app.put('/api/applicants/:id/restore', (req, res) => {
+  const updates = [];
+  const values = [];
+
+  if (status !== undefined) {
+    updates.push('status = ?');
+    values.push(status);
+  }
+
+  if (grounds_for_appeal !== undefined) {
+    updates.push('grounds_for_appeal = ?');
+    values.push(grounds_for_appeal);
+  }
+
+  if (hearing_date !== undefined) {
+    updates.push('hearing_date = ?');
+    values.push(hearing_date);
+  }
+
+  if (updates.length === 0) {
+    res.status(400).json({ error: 'No fields to update' });
+    return;
+  }
+
+  values.push(id);
+
   db.run(
-    'UPDATE applicants SET is_archived = 0, archived_at = NULL WHERE id = ?',
-    [req.params.id],
-    function(err) {
+    `UPDATE appeals SET ${updates.join(', ')} WHERE id = ?`,
+    values,
+    (err) => {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
+        return;
       }
-      res.json({ success: true, message: 'Applicant restored' });
+      res.json({ message: 'Appeal updated' });
     }
   );
 });
 
-// ================== DOCUMENT MANAGEMENT ==================
-// Get documents for applicant
-app.get('/api/applicants/:id/documents', (req, res) => {
-  db.all(
-    `SELECT d.*, u.username FROM documents d 
-     LEFT JOIN users u ON d.uploaded_by = u.id 
-     WHERE d.applicant_id = ? 
-     ORDER BY d.created_at DESC`,
-    [req.params.id],
-    (err, rows) => {
+// DELETE appeal
+app.delete('/api/appeals/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.run(
+    'DELETE FROM appeals WHERE id = ?',
+    [id],
+    (err) => {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
+        return;
       }
-      res.json(rows);
+      res.json({ message: 'Appeal deleted' });
     }
   );
 });
 
-// ================== DASHBOARD ANALYTICS ==================
-// Get statistics
+// ==================== DASHBOARD ROUTES ====================
+
+// GET dashboard statistics
 app.get('/api/dashboard/stats', (req, res) => {
-  db.all(
-    `SELECT 
-      (SELECT COUNT(*) FROM applicants WHERE is_archived = 0) as total_active,
-      (SELECT COUNT(*) FROM applicants WHERE is_blacklisted = 1 AND is_archived = 0) as total_blacklisted,
-      (SELECT COUNT(*) FROM applicants WHERE is_archived = 1) as total_archived,
-      (SELECT COUNT(*) FROM applicants WHERE status = 'Approved' AND is_archived = 0) as approved,
-      (SELECT COUNT(*) FROM applicants WHERE status = 'Pending' AND is_archived = 0) as pending,
-      (SELECT COUNT(*) FROM applicants WHERE status = 'Under Review' AND is_archived = 0) as under_review,
-      (SELECT COUNT(*) FROM applicants WHERE status = 'Rejected' AND is_archived = 0) as rejected`,
-    [],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows[0]);
-    }
-  );
+  db.serialize(() => {
+    Promise.all([
+      new Promise((resolve) => {
+        db.get('SELECT COUNT(*) as count FROM hoas', (err, row) => {
+          resolve(err ? 0 : row.count);
+        });
+      }),
+      new Promise((resolve) => {
+        db.get('SELECT COUNT(*) as count FROM hoas WHERE status_findings = ?', ['In Good Standing'], (err, row) => {
+          resolve(err ? 0 : row.count);
+        });
+      }),
+      new Promise((resolve) => {
+        db.get('SELECT COUNT(*) as count FROM hoas WHERE status_findings = ?', ['Sanctioned'], (err, row) => {
+          resolve(err ? 0 : row.count);
+        });
+      }),
+      new Promise((resolve) => {
+        db.get('SELECT SUM(total_members) as total FROM hoas', (err, row) => {
+          resolve(err ? 0 : (row.total || 0));
+        });
+      }),
+      new Promise((resolve) => {
+        db.get('SELECT COUNT(*) as count FROM legal_orders WHERE type = ?', ['NOV'], (err, row) => {
+          resolve(err ? 0 : row.count);
+        });
+      }),
+      new Promise((resolve) => {
+        db.get('SELECT COUNT(*) as count FROM legal_orders WHERE type = ? AND status = ?', ['OIAS', 'Active'], (err, row) => {
+          resolve(err ? 0 : row.count);
+        });
+      }),
+      new Promise((resolve) => {
+        db.get('SELECT COUNT(*) as count FROM hoas WHERE status_findings = ?', ['Under Review'], (err, row) => {
+          resolve(err ? 0 : row.count);
+        });
+      })
+    ]).then(([totalHoas, activeHoas, sanctionedHoas, totalMembers, totalNovs, activeOias, underReview]) => {
+      res.json({
+        totalHoas,
+        activeHoas,
+        sanctionedHoas,
+        totalMembers,
+        totalNovs,
+        activeOias,
+        underReview
+      });
+    });
+  });
 });
 
-// Get applicants by city
+// GET HOAs by city
 app.get('/api/dashboard/by-city', (req, res) => {
   db.all(
-    `SELECT city, COUNT(*) as count FROM applicants WHERE is_archived = 0 GROUP BY city ORDER BY count DESC`,
+    'SELECT city_municipality, COUNT(*) as count FROM hoas GROUP BY city_municipality ORDER BY count DESC LIMIT 10',
     [],
     (err, rows) => {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
+        return;
       }
-      res.json(rows);
+      res.json(rows || []);
     }
   );
 });
 
-// Get applicants by status
-app.get('/api/dashboard/by-status', (req, res) => {
-  db.all(
-    `SELECT status, COUNT(*) as count FROM applicants WHERE is_archived = 0 GROUP BY status ORDER BY count DESC`,
-    [],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows);
-    }
-  );
-});
+// ==================== EXPORT ROUTES ====================
 
-// ================== EXPORT FEATURES ==================
-// Export to Excel
-app.get('/api/export/excel', (req, res) => {
-  const { archived } = req.query;
-  const whereClause = archived === 'true' ? 'WHERE is_archived = 1' : 'WHERE is_archived = 0';
-  
-  db.all(
-    `SELECT control_number, first_name, last_name, city, status, is_blacklisted, created_at FROM applicants ${whereClause}`,
-    [],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
+// Export HOAs to CSV
+app.get('/api/export/hoas', (req, res) => {
+  db.all('SELECT * FROM hoas ORDER BY date_last_update DESC', [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+
+    if (!rows || rows.length === 0) {
+      res.status(404).json({ error: 'No data to export' });
+      return;
+    }
+
+    try {
+      const exportDir = path.join(__dirname, 'exports');
+      if (!fs.existsSync(exportDir)) {
+        fs.mkdirSync(exportDir, { recursive: true });
       }
-      
-      // Create simple CSV with BOM for Excel
-      let csv = '\uFEFF'; // UTF-8 BOM
-      csv += 'Control Number,First Name,Last Name,City,Status,Blacklisted,Created Date\n';
-      
-      rows.forEach(row => {
-        csv += `"${row.control_number}","${row.first_name}","${row.last_name}","${row.city}","${row.status}","${row.is_blacklisted}","${row.created_at}"\n`;
+
+      const csvWriter = createObjectCsvWriter({
+        path: path.join(exportDir, 'hoas_export.csv'),
+        header: [
+          { id: 'cert_of_inc_no', title: 'Cert of Inc No' },
+          { id: 'hoa_name', title: 'HOA Name' },
+          { id: 'reg_type', title: 'Registration Type' },
+          { id: 'issuance_date', title: 'Issuance Date' },
+          { id: 'classification', title: 'Classification' },
+          { id: 'city_municipality', title: 'City/Municipality' },
+          { id: 'contact_person', title: 'Contact Person' },
+          { id: 'total_members', title: 'Total Members' },
+          { id: 'status_findings', title: 'Status' }
+        ]
       });
-      
-      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="DHSUD_Export_${new Date().toISOString().split('T')[0]}.csv"`);
-      res.send(csv);
+
+      csvWriter.writeRecords(rows)
+        .then(() => {
+          res.download(path.join(exportDir, 'hoas_export.csv'));
+        })
+        .catch(err => {
+          res.status(500).json({ error: err.message });
+        });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-  );
+  });
 });
 
-// Health check
+// ==================== HEALTH CHECK ====================
+
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'DHSUD Database API is running' });
+  res.json({ status: 'OK', database: 'Connected' });
+});
+
+// ==================== ERROR HANDLING ====================
+
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 DHSUD Database Server running on http://localhost:${PORT}`);
-  console.log(`📊 Database file: ${dbPath}`);
+  console.log(`\n 🚀 DHSUD HOA Management System Backend\n`);
+  console.log(`📊 Server running on http://localhost:${PORT}`);
+  console.log(`💾 Database: ${dbPath}\n`);
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
   db.close((err) => {
     if (err) {
-      console.error('Error closing database:', err.message);
+      console.error('Error closing database:', err);
     } else {
-      console.log('Database connection closed');
+      console.log('\n✓ Database connection closed');
     }
     process.exit(0);
   });
