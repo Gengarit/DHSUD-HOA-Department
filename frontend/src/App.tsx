@@ -99,63 +99,29 @@ interface Application {
   crls_options?: string[];
 }
 
-export default function App() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState('All') 
-  const [applications, setApplications] = useState<Application[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [currentView, setCurrentView] = useState<'dashboard' | 'active' | 'archive'>('dashboard')
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
+// ==========================================
+// 🚀 NEW: ISOLATED PROJECT FORM MODAL
+// Moving this here completely stops input lag!
+// ==========================================
+const ProjectFormModal = ({ 
+  appToEdit, 
+  onClose, 
+  onSave, 
+  showNotification, 
+  requestConfirm 
+}: { 
+  appToEdit: Application | null, 
+  onClose: () => void, 
+  onSave: () => void,
+  showNotification: any,
+  requestConfirm: any
+}) => {
   
-  // NEW: State for Viewing full project details
-  const [viewingApp, setViewingApp] = useState<Application | null>(null)
-
-  const [selectedIds, setSelectedIds] = useState<number[]>([])
-  const [isBulkMode, setIsBulkMode] = useState(false)
-  
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success' })
-  
-  const [confirmDialog, setConfirmDialog] = useState<{
-    show: boolean; title: string; message: string; action: (() => void) | null; confirmText: string; confirmColor: string;
-  }>({
-    show: false, title: '', message: '', action: null, confirmText: 'Confirm', confirmColor: 'bg-blue-600'
-  })
-
-  const [promptDialog, setPromptDialog] = useState<{
-    show: boolean; title: string; message: string; placeholder: string; action: ((val: string) => void) | null;
-  }>({
-    show: false, title: '', message: '', placeholder: '', action: null
-  })
-  const [promptValue, setPromptValue] = useState('')
-
-  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast(prev => ({ ...prev, show: false })), 4000);
-  }
-
-  const requestConfirm = (title: string, message: string, action: () => void, confirmText: string, confirmColor: string) => {
-    setConfirmDialog({ show: true, title, message, action, confirmText, confirmColor });
-  }
-
   const emptyForm = {
-    name_of_proj: '',
-    proj_owner_dev: '',
-    status_of_application: 'Ongoing',
-    type_of_application: 'New Application',
-    cr_no: '',
-    ls_no: '',
-    proj_type: '',
-    main_or_compliance: 'Main',
-    date_filed: '',
-    date_issued: '',
-    date_completion: '',
-    prov: '',
-    mun_city: '',
-    street_brgy: '',
-    crls_options: [] as string[]
-  }
-  const [formData, setFormData] = useState(emptyForm)
+    name_of_proj: '', proj_owner_dev: '', status_of_application: 'Ongoing', type_of_application: 'New Application', cr_no: '', ls_no: '', proj_type: '', main_or_compliance: 'Main', date_filed: '', date_issued: '', date_completion: '', prov: '', mun_city: '', street_brgy: '', crls_options: [] as string[]
+  };
+
+  const [formData, setFormData] = useState(appToEdit || emptyForm);
 
   const [locationDB, setLocationDB] = useState<Record<string, Record<string, string[]>>>(() => {
     const saved = localStorage.getItem('dhsud_custom_locations');
@@ -171,9 +137,10 @@ export default function App() {
     return initialNirLocations;
   });
 
-  useEffect(() => {
-    localStorage.setItem('dhsud_custom_locations', JSON.stringify(locationDB));
-  }, [locationDB]);
+  const [promptDialog, setPromptDialog] = useState({ show: false, title: '', message: '', placeholder: '', action: null as any });
+  const [promptValue, setPromptValue] = useState('');
+
+  useEffect(() => { localStorage.setItem('dhsud_custom_locations', JSON.stringify(locationDB)); }, [locationDB]);
 
   const availableProvinces = Object.keys(locationDB);
   const availableCities = formData.prov ? Object.keys(locationDB[formData.prov] || {}).sort() : [];
@@ -184,7 +151,7 @@ export default function App() {
     setPromptValue(''); 
     setPromptDialog({
       show: true, title: 'Add Municipality / City', message: `Add a new city or municipality to the list for ${formData.prov}.`, placeholder: 'e.g. Talisay City',
-      action: (newCity) => {
+      action: (newCity: string) => {
         if (newCity && newCity.trim() !== '') {
           const cleanCity = newCity.trim();
           if (!locationDB[formData.prov][cleanCity]) {
@@ -201,18 +168,11 @@ export default function App() {
 
   const handleDeleteCity = () => {
     if (!formData.prov || !formData.mun_city) return;
-    requestConfirm(
-      "Delete City", `Are you sure you want to permanently delete '${formData.mun_city}' from ${formData.prov}?`, 
-      () => {
-        setLocationDB(prev => {
-          const updatedProv = { ...prev[formData.prov] };
-          delete updatedProv[formData.mun_city];
-          return { ...prev, [formData.prov]: updatedProv };
-        });
-        setFormData(prev => ({ ...prev, mun_city: '', street_brgy: '' }));
-        showNotification(`Deleted ${formData.mun_city}.`, "success");
-      }, "Delete City", "bg-red-600 hover:bg-red-700"
-    );
+    requestConfirm("Delete City", `Are you sure you want to permanently delete '${formData.mun_city}' from ${formData.prov}?`, () => {
+      setLocationDB(prev => { const updatedProv = { ...prev[formData.prov] }; delete updatedProv[formData.mun_city]; return { ...prev, [formData.prov]: updatedProv }; });
+      setFormData(prev => ({ ...prev, mun_city: '', street_brgy: '' }));
+      showNotification(`Deleted ${formData.mun_city}.`, "success");
+    }, "Delete City", "bg-red-600 hover:bg-red-700");
   }
 
   const handleAddBrgy = () => {
@@ -220,7 +180,7 @@ export default function App() {
     setPromptValue(''); 
     setPromptDialog({
       show: true, title: 'Add Barangay', message: `Add a new barangay to the list for ${formData.mun_city}.`, placeholder: 'e.g. Zone 1',
-      action: (newBrgy) => {
+      action: (newBrgy: string) => {
         if (newBrgy && newBrgy.trim() !== '') {
           const cleanBrgy = newBrgy.trim();
           if (!locationDB[formData.prov][formData.mun_city].includes(cleanBrgy)) {
@@ -237,21 +197,272 @@ export default function App() {
 
   const handleDeleteBrgy = () => {
     if (!formData.prov || !formData.mun_city || !formData.street_brgy) return;
-    requestConfirm(
-      "Delete Barangay", `Are you sure you want to permanently delete '${formData.street_brgy}' from ${formData.mun_city}?`, 
-      () => {
-        setLocationDB(prev => ({ ...prev, [formData.prov]: { ...prev[formData.prov], [formData.mun_city]: prev[formData.prov][formData.mun_city].filter(b => b !== formData.street_brgy) } }));
-        setFormData(prev => ({ ...prev, street_brgy: '' }));
-        showNotification(`Deleted ${formData.street_brgy}.`, "success");
-      }, "Delete Barangay", "bg-red-600 hover:bg-red-700"
-    );
+    requestConfirm("Delete Barangay", `Are you sure you want to permanently delete '${formData.street_brgy}' from ${formData.mun_city}?`, () => {
+      setLocationDB(prev => ({ ...prev, [formData.prov]: { ...prev[formData.prov], [formData.mun_city]: prev[formData.prov][formData.mun_city].filter(b => b !== formData.street_brgy) } }));
+      setFormData(prev => ({ ...prev, street_brgy: '' }));
+      showNotification(`Deleted ${formData.street_brgy}.`, "success");
+    }, "Delete Barangay", "bg-red-600 hover:bg-red-700");
   }
 
-  // --- Strict Numeric & Dash Input handler ---
   const handleNumericDashInput = (e: React.ChangeEvent<HTMLInputElement>, field: 'cr_no' | 'ls_no') => {
     const value = e.target.value.replace(/[^0-9-]/g, '');
     setFormData({ ...formData, [field]: value });
   };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const payload: any = { 
+      ...formData,
+      date_filed: formData.date_filed === '' ? null : formData.date_filed,
+      date_issued: formData.date_issued === '' ? null : formData.date_issued,
+      date_completion: formData.date_completion === '' ? null : formData.date_completion,
+    }
+
+    const apiCall = appToEdit ? axios.patch(`http://127.0.0.1:8000/api/applications/${appToEdit.id}/`, payload) : axios.post('http://127.0.0.1:8000/api/applications/', payload);
+
+    apiCall.then(() => {
+        showNotification(appToEdit ? "Project updated successfully" : "New project created successfully", "success");
+        onSave(); // Triggers table refresh and closes modal
+      })
+      .catch(err => showNotification("Action failed! Check server connection.", "error"));
+  }
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+          <div className="px-7 py-5 border-b border-slate-200 flex justify-between items-center">
+            <h3 className="text-xl font-bold text-slate-800">{appToEdit ? 'Edit Project' : 'Add New Project'}</h3>
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-lg transition-colors">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          
+          <div className="overflow-y-auto p-7 bg-slate-50/50">
+            <form id="app-form" onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* TOP SECTION */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  Project Details
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Project Name *</label>
+                    <input required type="text" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" value={formData.name_of_proj} onChange={e => setFormData({...formData, name_of_proj: e.target.value})} />
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Owner / Developer</label>
+                    <input type="text" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" value={formData.proj_owner_dev} onChange={e => setFormData({...formData, proj_owner_dev: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Project Type</label>
+                    <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.proj_type} onChange={e => setFormData({...formData, proj_type: e.target.value})}>
+                      <option value="" disabled>Select Type...</option>
+                      {projTypeOptionsList.map((type) => (<option key={type} value={type}>{type}</option>))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Application Type</label>
+                    <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.type_of_application} onChange={e => setFormData({...formData, type_of_application: e.target.value})}>
+                      <option value="New Application">New Application</option><option value="Reactivated">Reactivated</option><option value="Replacement">Replacement</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Current Status</label>
+                    <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.status_of_application} onChange={e => setFormData({...formData, status_of_application: e.target.value})}>
+                      <option value="Ongoing">Ongoing</option><option value="Approved">Approved</option><option value="Denied">Denied</option><option value="Endorsed to HREDRB">Endorsed to HREDRB</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Main or Compliance</label>
+                    <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.main_or_compliance} onChange={e => setFormData({...formData, main_or_compliance: e.target.value})}>
+                      <option value="Main">Main</option><option value="Compliance">Compliance</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* MID SECTION */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                  Certifications
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                  {crlsOptionsList.map((option) => (
+                    <label key={option} className="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-blue-300 hover:bg-blue-50/50 cursor-pointer transition-all">
+                      <input type="checkbox" className="w-4.5 h-4.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" value={option} checked={formData.crls_options?.includes(option) || false}
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          setFormData(prev => ({
+                            ...prev, crls_options: isChecked ? [...(prev.crls_options || []), option] : (prev.crls_options || []).filter(item => item !== option)
+                          }));
+                        }}
+                      />
+                      <span className="text-slate-700 font-medium text-sm">{option}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="flex flex-col relative group">
+                    <div className="h-5 mb-2 flex justify-between items-center">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">CR No.</label>
+                    </div>
+                    <input type="text" placeholder="0000-00-000" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" value={formData.cr_no} onChange={(e) => handleNumericDashInput(e, 'cr_no')} />
+                  </div>
+                  <div className="flex flex-col relative group">
+                    <div className="h-5 mb-2 flex justify-between items-center">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">LS No.</label>
+                    </div>
+                    <input type="text" placeholder="0000-00-000" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" value={formData.ls_no} onChange={(e) => handleNumericDashInput(e, 'ls_no')} />
+                  </div>
+                </div>
+              </div>
+
+              {/* LOCATION SECTION */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  Location Details
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="flex flex-col relative">
+                    <div className="h-5 mb-2 flex items-center">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Province</label>
+                    </div>
+                    <select required className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" 
+                      value={formData.prov} onChange={e => setFormData({...formData, prov: e.target.value, mun_city: '', street_brgy: ''})}
+                    >
+                      <option value="" disabled>Select Province...</option>
+                      {availableProvinces.map(prov => (<option key={prov} value={prov}>{prov}</option>))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col relative">
+                    <div className="h-5 mb-2 flex items-center">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Municipality / City</label>
+                      <div className="absolute right-0 top-0 flex gap-1 h-5 items-center">
+                        {formData.prov && (<button type="button" onClick={handleAddCity} className="whitespace-nowrap text-[10px] text-blue-600 hover:underline font-bold bg-blue-50 px-1.5 py-0.5 rounded">+ Add</button>)}
+                        {formData.mun_city && (<button type="button" onClick={handleDeleteCity} className="whitespace-nowrap text-[10px] text-red-500 hover:underline font-bold bg-red-50 px-1.5 py-0.5 rounded">− Del</button>)}
+                      </div>
+                    </div>
+                    <select required disabled={!formData.prov} className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer disabled:bg-slate-50 disabled:text-slate-400" 
+                      value={formData.mun_city} onChange={e => setFormData({...formData, mun_city: e.target.value, street_brgy: ''})}
+                    >
+                      <option value="" disabled>Select City/Mun...</option>
+                      {availableCities.map(city => (<option key={city} value={city}>{city}</option>))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col relative">
+                    <div className="h-5 mb-2 flex items-center">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Barangay</label>
+                      <div className="absolute right-0 top-0 flex gap-1 h-5 items-center">
+                        {formData.mun_city && (<button type="button" onClick={handleAddBrgy} className="whitespace-nowrap text-[10px] text-blue-600 hover:underline font-bold bg-blue-50 px-1.5 py-0.5 rounded">+ Add</button>)}
+                        {formData.street_brgy && (<button type="button" onClick={handleDeleteBrgy} className="whitespace-nowrap text-[10px] text-red-500 hover:underline font-bold bg-red-50 px-1.5 py-0.5 rounded">− Del</button>)}
+                      </div>
+                    </div>
+                    <select required disabled={!formData.mun_city || availableBarangays.length === 0} className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer disabled:bg-slate-50 disabled:text-slate-400" 
+                      value={formData.street_brgy} onChange={e => setFormData({...formData, street_brgy: e.target.value})}
+                    >
+                      <option value="" disabled>Select Barangay...</option>
+                      {availableBarangays.map(brgy => (<option key={brgy} value={brgy}>{brgy}</option>))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* DATES SECTION */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Important Dates
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Date Filed</label>
+                    <input type="date" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.date_filed || ''} onChange={e => setFormData({...formData, date_filed: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Date Issued</label>
+                    <input type="date" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.date_issued || ''} onChange={e => setFormData({...formData, date_issued: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Date Completion</label>
+                    <input type="date" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.date_completion || ''} onChange={e => setFormData({...formData, date_completion: e.target.value})} />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          
+          <div className="px-7 py-5 border-t border-slate-200 bg-white flex justify-end gap-3 rounded-b-2xl">
+            <button type="button" onClick={onClose} className="px-6 py-2.5 text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl font-bold text-sm transition-colors shadow-sm">Cancel</button>
+            <button type="submit" form="app-form" className="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm">
+              {appToEdit ? 'Save Changes' : 'Create Project'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Embedded Prompt Dialog */}
+      {promptDialog.show && (
+        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-[80]">
+          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-8 relative animate-in zoom-in-95 duration-200">
+            <button onClick={() => setPromptDialog({ ...promptDialog, show: false })} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-xl transition-all">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div className="mx-auto mb-6 w-16 h-16 rounded-[20px] flex items-center justify-center bg-blue-50 text-blue-500">
+              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+            </div>
+            <h3 className="text-2xl font-bold text-slate-800 text-center mb-2">{promptDialog.title}</h3>
+            <p className="text-slate-500 text-sm leading-relaxed text-center mb-6 px-2">{promptDialog.message}</p>
+            <input type="text" autoFocus className="w-full mb-6 border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" placeholder={promptDialog.placeholder} value={promptValue} onChange={(e) => setPromptValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); promptDialog.action?.(promptValue); setPromptDialog({ ...promptDialog, show: false }); } }} />
+            <div className="flex flex-col gap-3">
+              <button onClick={() => { promptDialog.action?.(promptValue); setPromptDialog({ ...promptDialog, show: false }); }} className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-colors shadow-sm">Add Location</button>
+              <button onClick={() => setPromptDialog({ ...promptDialog, show: false })} className="w-full py-3.5 text-slate-700 bg-white border-[1.5px] border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl font-semibold text-sm transition-all">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// ==========================================
+// MAIN APP COMPONENT
+// ==========================================
+export default function App() {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState('All') 
+  const [applications, setApplications] = useState<Application[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentView, setCurrentView] = useState<'dashboard' | 'active' | 'archive'>('dashboard')
+  
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingApp, setEditingApp] = useState<Application | null>(null)
+  const [viewingApp, setViewingApp] = useState<Application | null>(null)
+  
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [isBulkMode, setIsBulkMode] = useState(false)
+  
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' })
+  
+  const [confirmDialog, setConfirmDialog] = useState<{
+    show: boolean; title: string; message: string; action: (() => void) | null; confirmText: string; confirmColor: string;
+  }>({
+    show: false, title: '', message: '', action: null, confirmText: 'Confirm', confirmColor: 'bg-blue-600'
+  })
+
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, show: false })), 4000);
+  }
+
+  const requestConfirm = (title: string, message: string, action: () => void, confirmText: string, confirmColor: string) => {
+    setConfirmDialog({ show: true, title, message, action, confirmText, confirmColor });
+  }
 
   const fetchApplications = () => {
     setIsLoading(true);
@@ -307,7 +518,8 @@ export default function App() {
   const filteredApps = displayApps.filter(app => {
     const matchesSearch = app.name_of_proj.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           app.mun_city.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'All' || app.status_of_application === filterStatus;
+    // Bypass the status filter entirely if we are in the archive view
+    const matchesStatus = currentView === 'archive' || filterStatus === 'All' || app.status_of_application === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -349,21 +561,7 @@ export default function App() {
 
   const handleExport = () => {
     const dataToExport = filteredApps.map(app => ({
-      'Type of Application': app.type_of_application || '',
-      'Status of Application': app.status_of_application || '',
-      'New or Amended CRLS (Can choose many)': app.crls_options?.join(', ') || '',
-      'Main or Compliance': app.main_or_compliance || '',
-      'Date Filed': app.date_filed || '',
-      'Date Issued': app.date_issued || '',
-      'Date Completion': app.date_completion || '',
-      'CR No.': app.cr_no || '',
-      'LS No.': app.ls_no || '',
-      'Name of Proj': app.name_of_proj || '',
-      'Proj Owner Dev': app.proj_owner_dev || '', 
-      'Prov': app.prov || '',
-      'Mun/City': app.mun_city || '',
-      'Street/Brgy': app.street_brgy || '',
-      'Proj Type': app.proj_type || ''
+      'Type of Application': app.type_of_application || '', 'Status of Application': app.status_of_application || '', 'New or Amended CRLS (Can choose many)': app.crls_options?.join(', ') || '', 'Main or Compliance': app.main_or_compliance || '', 'Date Filed': app.date_filed || '', 'Date Issued': app.date_issued || '', 'Date Completion': app.date_completion || '', 'CR No.': app.cr_no || '', 'LS No.': app.ls_no || '', 'Name of Proj': app.name_of_proj || '', 'Proj Owner Dev': app.proj_owner_dev || '', 'Prov': app.prov || '', 'Mun/City': app.mun_city || '', 'Street/Brgy': app.street_brgy || '', 'Proj Type': app.proj_type || ''
     }));
 
     const ws = XLSX.utils.json_to_sheet(dataToExport);
@@ -392,25 +590,11 @@ export default function App() {
 
         jsonData.forEach((row) => {
           axios.post('http://127.0.0.1:8000/api/applications/', {
-            name_of_proj: row['Name of Proj'] || row['Project Name'] || 'Untitled Project', 
-            proj_owner_dev: row['Proj Owner Dev'] || '', 
-            proj_type: row['Proj Type'] || '',
-            type_of_application: row['Type of Application'] || 'New Application',
-            status_of_application: row['Status of Application'] || 'Ongoing',
-            main_or_compliance: row['Main or Compliance'] || 'Main',
-            prov: row['Prov'] || '',
-            mun_city: row['Mun/City'] || '',
-            street_brgy: row['Street/Brgy'] || '',
-            cr_no: row['CR No.'] || row['CR No'] || '',
-            ls_no: row['LS No.'] || row['LS No'] || '',
-            crls_options: row['New or Amended CRLS (Can choose many)'] 
-              ? row['New or Amended CRLS (Can choose many)'].split(',').map((s: string) => s.trim()) 
-              : []
+            name_of_proj: row['Name of Proj'] || row['Project Name'] || 'Untitled Project', proj_owner_dev: row['Proj Owner Dev'] || '', proj_type: row['Proj Type'] || '', type_of_application: row['Type of Application'] || 'New Application', status_of_application: row['Status of Application'] || 'Ongoing', main_or_compliance: row['Main or Compliance'] || 'Main', prov: row['Prov'] || '', mun_city: row['Mun/City'] || '', street_brgy: row['Street/Brgy'] || '', cr_no: row['CR No.'] || row['CR No'] || '', ls_no: row['LS No.'] || row['LS No'] || '', crls_options: row['New or Amended CRLS (Can choose many)'] ? row['New or Amended CRLS (Can choose many)'].split(',').map((s: string) => s.trim()) : []
           })
           .then(() => fetchApplications())
           .catch(err => console.error("Import error:", err));
         });
-
         showNotification(`Successfully imported ${jsonData.length} records!`, "success");
       } catch (error) {
         showNotification("Failed to read file. Please check the format.", "error");
@@ -419,39 +603,6 @@ export default function App() {
     };
     reader.readAsArrayBuffer(file);
   };
-
-  const handleOpenModal = (app: Application | null = null) => {
-    if (app) {
-      setEditingId(app.id)
-      setFormData({
-        name_of_proj: app.name_of_proj, proj_owner_dev: app.proj_owner_dev || '', status_of_application: app.status_of_application, type_of_application: app.type_of_application, cr_no: app.cr_no || '', ls_no: app.ls_no || '', proj_type: app.proj_type || '', main_or_compliance: app.main_or_compliance || 'Main', date_filed: app.date_filed || '', date_issued: app.date_issued || '', date_completion: app.date_completion || '', prov: app.prov || '', mun_city: app.mun_city || '', street_brgy: app.street_brgy || '', crls_options: app.crls_options || [] 
-      })
-    } else {
-      setEditingId(null)
-      setFormData(emptyForm)
-    }
-    setIsModalOpen(true)
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const payload: any = { 
-      ...formData,
-      date_filed: formData.date_filed === '' ? null : formData.date_filed,
-      date_issued: formData.date_issued === '' ? null : formData.date_issued,
-      date_completion: formData.date_completion === '' ? null : formData.date_completion,
-    }
-
-    const apiCall = editingId ? axios.patch(`http://127.0.0.1:8000/api/applications/${editingId}/`, payload) : axios.post('http://127.0.0.1:8000/api/applications/', payload);
-
-    apiCall.then(() => {
-        fetchApplications();
-        setIsModalOpen(false);
-        showNotification(editingId ? "Project updated successfully" : "New project created successfully", "success");
-      })
-      .catch(err => showNotification("Action failed! Check server connection.", "error"));
-  }
 
   const handleSoftDelete = (id: number) => {
     requestConfirm("Archive Project", "Are you sure you want to move this project to the archives?", () => {
@@ -483,82 +634,23 @@ export default function App() {
       {/* --- PREMIUM TOAST NOTIFICATION --- */}
       {toast.show && (
         <div className="fixed top-8 right-8 z-[100] min-w-[320px] max-w-md bg-white border border-slate-100 rounded-2xl shadow-2xl p-4 flex items-start gap-4 animate-in slide-in-from-top-8 fade-in duration-300">
-          
-          {/* Dynamic Icon Container */}
           <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
             toast.type === 'success' ? 'bg-emerald-100 text-emerald-600' : 
-            toast.type === 'error' ? 'bg-red-100 text-red-600' : 
-            'bg-blue-100 text-blue-600'
+            toast.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
           }`}>
-            {toast.type === 'success' && (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-            )}
-            {toast.type === 'error' && (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-            )}
-            {toast.type === 'info' && (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            )}
+            {toast.type === 'success' && (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>)}
+            {toast.type === 'error' && (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>)}
+            {toast.type === 'info' && (<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>)}
           </div>
-
-          {/* Text Content */}
           <div className="flex-1 pt-0.5">
             <p className="text-sm font-bold text-slate-800">
               {toast.type === 'success' ? 'Success!' : toast.type === 'error' ? 'Action Failed' : 'System Notice'}
             </p>
             <p className="text-xs font-medium text-slate-500 mt-0.5 leading-relaxed">{toast.message}</p>
           </div>
-
-          {/* Close Button */}
-          <button 
-            onClick={() => setToast({ ...toast, show: false })} 
-            className="shrink-0 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
-          >
+          <button onClick={() => setToast({ ...toast, show: false })} className="shrink-0 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
-        </div>
-      )}
-
-      {/* --- PROMPT DIALOG (For Adding City/Brgy) --- */}
-      {promptDialog.show && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-[80]">
-          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-8 relative animate-in zoom-in-95 duration-200">
-            <button onClick={() => setPromptDialog({ ...promptDialog, show: false })} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-xl transition-all">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-
-            <div className="mx-auto mb-6 w-16 h-16 rounded-[20px] flex items-center justify-center bg-blue-50 text-blue-500">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-            </div>
-
-            <h3 className="text-2xl font-bold text-slate-800 text-center mb-2">{promptDialog.title}</h3>
-            <p className="text-slate-500 text-sm leading-relaxed text-center mb-6 px-2">{promptDialog.message}</p>
-
-            <input 
-              type="text" 
-              autoFocus
-              className="w-full mb-6 border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm"
-              placeholder={promptDialog.placeholder}
-              value={promptValue}
-              onChange={(e) => setPromptValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  promptDialog.action?.(promptValue);
-                  setPromptDialog({ ...promptDialog, show: false });
-                }
-              }}
-            />
-
-            <div className="flex flex-col gap-3">
-              <button onClick={() => { promptDialog.action?.(promptValue); setPromptDialog({ ...promptDialog, show: false }); }} className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-colors shadow-sm">
-                Add Location
-              </button>
-              <button onClick={() => setPromptDialog({ ...promptDialog, show: false })} className="w-full py-3.5 text-slate-700 bg-white border-[1.5px] border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl font-semibold text-sm transition-all">
-                Cancel
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
@@ -708,7 +800,7 @@ export default function App() {
                       <button onClick={handleExport} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm">
                         Export Data
                       </button>
-                      <button onClick={() => handleOpenModal(null)} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm">
+                      <button onClick={() => { setEditingApp(null); setIsModalOpen(true); }} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm">
                         + Add New Project
                       </button>
                     </>
@@ -736,13 +828,17 @@ export default function App() {
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><SearchIcon /></div>
                   <input type="text" placeholder="Search projects or locations..." className="w-full pl-11 pr-5 py-3 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-medium transition-all shadow-sm placeholder:text-slate-400" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                 </div>
-                <select className="px-5 py-3 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-semibold text-slate-700 min-w-[180px] transition-all shadow-sm cursor-pointer" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-                  <option value="All">All Statuses</option>
-                  <option value="Ongoing">Ongoing</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Denied">Denied</option>
-                  <option value="Endorsed to HREDRB">Endorsed to HREDRB</option>
-                </select>
+                
+                {/* ONLY show the status dropdown if we are viewing Active Projects */}
+                {currentView === 'active' && (
+                  <select className="px-5 py-3 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-semibold text-slate-700 min-w-[180px] transition-all shadow-sm cursor-pointer" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                    <option value="All">All Statuses</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Denied">Denied</option>
+                    <option value="Endorsed to HREDRB">Endorsed to HREDRB</option>
+                  </select>
+                )}
               </div>
 
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -767,7 +863,6 @@ export default function App() {
                         <tr key={app.id} className={`hover:bg-slate-50 transition-colors ${selectedIds.includes(app.id) ? 'bg-blue-50/50' : ''}`}>
                           {isBulkMode && (<td className="px-6 py-5"><input type="checkbox" className="w-4.5 h-4.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer" checked={selectedIds.includes(app.id)} onChange={() => handleSelectRow(app.id)} /></td>)}
                           <td className="px-6 py-5">
-                            {/* UPDATED: Clickable Project Name */}
                             <div 
                               className="font-bold text-blue-600 hover:text-blue-800 cursor-pointer hover:underline text-base transition-colors"
                               onClick={() => setViewingApp(app)}
@@ -792,9 +887,8 @@ export default function App() {
                           <td className="px-6 py-5 text-right space-x-2">
                             {currentView === 'active' ? (
                               <>
-                                {/* UPDATED: View Icon Button */}
                                 <button title="View Details" onClick={() => setViewingApp(app)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all inline-flex"><ViewIcon /></button>
-                                <button title="Edit Project" onClick={() => handleOpenModal(app)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all inline-flex"><EditIcon /></button>
+                                <button title="Edit Project" onClick={() => { setEditingApp(app); setIsModalOpen(true); }} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all inline-flex"><EditIcon /></button>
                                 <button title="Archive Project" onClick={() => handleSoftDelete(app.id)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all inline-flex"><ArchiveIcon /></button>
                               </>
                             ) : (
@@ -816,193 +910,18 @@ export default function App() {
         </div>
       </main>
 
-      {/* --- FORM ENTRY MODAL --- */}
+      {/* --- RENDER THE ISOLATED PROJECT MODAL --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-            <div className="px-7 py-5 border-b border-slate-200 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-slate-800">{editingId ? 'Edit Project' : 'Add New Project'}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            
-            <div className="overflow-y-auto p-7 bg-slate-50/50">
-              <form id="app-form" onSubmit={handleSubmit} className="space-y-6">
-                
-                {/* TOP SECTION */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Project Details
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Project Name *</label>
-                      <input required type="text" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" value={formData.name_of_proj} onChange={e => setFormData({...formData, name_of_proj: e.target.value})} />
-                    </div>
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Owner / Developer</label>
-                      <input type="text" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" value={formData.proj_owner_dev} onChange={e => setFormData({...formData, proj_owner_dev: e.target.value})} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Project Type</label>
-                      <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.proj_type} onChange={e => setFormData({...formData, proj_type: e.target.value})}>
-                        <option value="" disabled>Select Type...</option>
-                        {projTypeOptionsList.map((type) => (<option key={type} value={type}>{type}</option>))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Application Type</label>
-                      <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.type_of_application} onChange={e => setFormData({...formData, type_of_application: e.target.value})}>
-                        <option value="New Application">New Application</option><option value="Reactivated">Reactivated</option><option value="Replacement">Replacement</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Current Status</label>
-                      <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.status_of_application} onChange={e => setFormData({...formData, status_of_application: e.target.value})}>
-                        <option value="Ongoing">Ongoing</option><option value="Approved">Approved</option><option value="Denied">Denied</option><option value="Endorsed to HREDRB">Endorsed to HREDRB</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Main or Compliance</label>
-                      <select className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.main_or_compliance} onChange={e => setFormData({...formData, main_or_compliance: e.target.value})}>
-                        <option value="Main">Main</option><option value="Compliance">Compliance</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* MID SECTION */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
-                    Certifications
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                    {crlsOptionsList.map((option) => (
-                      <label key={option} className="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-blue-300 hover:bg-blue-50/50 cursor-pointer transition-all">
-                        <input type="checkbox" className="w-4.5 h-4.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" value={option} checked={formData.crls_options?.includes(option) || false}
-                          onChange={(e) => {
-                            const isChecked = e.target.checked;
-                            setFormData(prev => ({
-                              ...prev, crls_options: isChecked ? [...(prev.crls_options || []), option] : (prev.crls_options || []).filter(item => item !== option)
-                            }));
-                          }}
-                        />
-                        <span className="text-slate-700 font-medium text-sm">{option}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">CR No.</label>
-                      <input type="text" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" placeholder="e.g. 12345" value={formData.cr_no} onChange={(e) => handleNumericDashInput(e, 'cr_no')} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">LS No.</label>
-                      <input type="text" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm" placeholder="e.g. 67890" value={formData.ls_no} onChange={(e) => handleNumericDashInput(e, 'ls_no')} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* --- LOCATION SECTION --- */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Location Details
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    
-                    <div className="flex flex-col relative">
-                      <div className="h-5 mb-2 flex items-center">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Province</label>
-                      </div>
-                      <select required className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" 
-                        value={formData.prov} onChange={e => setFormData({...formData, prov: e.target.value, mun_city: '', street_brgy: ''})}
-                      >
-                        <option value="" disabled>Select Province...</option>
-                        {availableProvinces.map(prov => (<option key={prov} value={prov}>{prov}</option>))}
-                      </select>
-                    </div>
-
-                    <div className="flex flex-col relative">
-                      <div className="h-5 mb-2 flex items-center">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Municipality / City</label>
-                        <div className="absolute right-0 top-0 flex gap-1 h-5 items-center">
-                          {formData.prov && (
-                            <button type="button" onClick={handleAddCity} className="whitespace-nowrap text-[10px] text-blue-600 hover:underline font-bold bg-blue-50 px-1.5 py-0.5 rounded">+ Add</button>
-                          )}
-                          {formData.mun_city && (
-                            <button type="button" onClick={handleDeleteCity} className="whitespace-nowrap text-[10px] text-red-500 hover:underline font-bold bg-red-50 px-1.5 py-0.5 rounded">− Del</button>
-                          )}
-                        </div>
-                      </div>
-                      <select required disabled={!formData.prov} className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer disabled:bg-slate-50 disabled:text-slate-400" 
-                        value={formData.mun_city} onChange={e => setFormData({...formData, mun_city: e.target.value, street_brgy: ''})}
-                      >
-                        <option value="" disabled>Select City/Mun...</option>
-                        {availableCities.map(city => (<option key={city} value={city}>{city}</option>))}
-                      </select>
-                    </div>
-
-                    <div className="flex flex-col relative">
-                      <div className="h-5 mb-2 flex items-center">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Barangay</label>
-                        <div className="absolute right-0 top-0 flex gap-1 h-5 items-center">
-                          {formData.mun_city && (
-                            <button type="button" onClick={handleAddBrgy} className="whitespace-nowrap text-[10px] text-blue-600 hover:underline font-bold bg-blue-50 px-1.5 py-0.5 rounded">+ Add</button>
-                          )}
-                          {formData.street_brgy && (
-                            <button type="button" onClick={handleDeleteBrgy} className="whitespace-nowrap text-[10px] text-red-500 hover:underline font-bold bg-red-50 px-1.5 py-0.5 rounded">− Del</button>
-                          )}
-                        </div>
-                      </div>
-                      <select required disabled={!formData.mun_city || availableBarangays.length === 0} className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer disabled:bg-slate-50 disabled:text-slate-400" 
-                        value={formData.street_brgy} onChange={e => setFormData({...formData, street_brgy: e.target.value})}
-                      >
-                        <option value="" disabled>Select Barangay...</option>
-                        {availableBarangays.map(brgy => (<option key={brgy} value={brgy}>{brgy}</option>))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* DATES SECTION */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h4 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    Important Dates
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Date Filed</label>
-                      <input type="date" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.date_filed || ''} onChange={e => setFormData({...formData, date_filed: e.target.value})} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Date Issued</label>
-                      <input type="date" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.date_issued || ''} onChange={e => setFormData({...formData, date_issued: e.target.value})} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Date Completion</label>
-                      <input type="date" className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-800 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer" value={formData.date_completion || ''} onChange={e => setFormData({...formData, date_completion: e.target.value})} />
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            
-            <div className="px-7 py-5 border-t border-slate-200 bg-white flex justify-end gap-3 rounded-b-2xl">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl font-bold text-sm transition-colors shadow-sm">Cancel</button>
-              <button type="submit" form="app-form" className="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm">
-                {editingId ? 'Save Changes' : 'Create Project'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProjectFormModal 
+          appToEdit={editingApp} 
+          onClose={() => setIsModalOpen(false)} 
+          onSave={() => { setIsModalOpen(false); fetchApplications(); }} 
+          showNotification={showNotification}
+          requestConfirm={requestConfirm}
+        />
       )}
 
-      {/* --- NEW: VIEW PROJECT DETAILS MODAL --- */}
+      {/* --- RENDER THE VIEW DETAILS MODAL --- */}
       {viewingApp && (
         <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
@@ -1017,8 +936,6 @@ export default function App() {
             
             <div className="overflow-y-auto p-7 bg-white">
               <div className="space-y-8">
-                
-                {/* Header Profile */}
                 <div>
                   <h2 className="text-3xl font-black text-slate-800 tracking-tight">{viewingApp.name_of_proj}</h2>
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -1091,7 +1008,6 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
             
