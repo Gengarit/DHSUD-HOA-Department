@@ -8,13 +8,6 @@ class Developer(models.Model):
     def __str__(self):
         return self.name
 
-class CRLSOption(models.Model):
-    """Table for the 'New or Amended CRLS' multi-select choices."""
-    name = models.CharField(max_length=100) # e.g., 'New LS', 'Amended CR', etc.
-
-    def __str__(self):
-        return self.name
-
 class ProjectApplication(models.Model):
     """Main table for the DHSUD Compliance Tracking"""
 
@@ -42,7 +35,7 @@ class ProjectApplication(models.Model):
     
     # Core Details
     name_of_proj = models.CharField(max_length=255, verbose_name="Name of Project")
-    proj_owner_dev = models.ForeignKey(Developer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Project Owner/Developer")
+    proj_owner_dev = models.CharField(max_length=255, blank=True, null=True)
     proj_type = models.CharField(max_length=100, null=True, blank=True, verbose_name="Project Type")
     
     # Application Status & Types
@@ -50,10 +43,10 @@ class ProjectApplication(models.Model):
     status_of_application = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Ongoing')
     main_or_compliance = models.CharField(max_length=20, choices=CATEGORY_CHOICES, null=True, blank=True)
     
-    # This creates the "Can choose many" functionality
-    new_or_amended_crls = models.ManyToManyField(CRLSOption, blank=True, verbose_name="New or Amended CRLS")
+    # The JSONField to handle the React checkboxes
+    crls_options = models.JSONField(blank=True, null=True, default=list, verbose_name="CR/LS Options")
     
-    # Dates (null=True, blank=True means the encoder can leave them empty if unknown)
+    # Dates 
     date_filed = models.DateField(null=True, blank=True)
     date_issued = models.DateField(null=True, blank=True)
     date_completion = models.DateField(null=True, blank=True)
